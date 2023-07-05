@@ -5,6 +5,7 @@ import { NetworkMessages } from "@common/network/messages";
 import ReactLogo from "@ui/assets/react.svg?component";
 import viteLogo from "@ui/assets/vite.svg?inline";
 import figmaLogo from "@ui/assets/figma.png";
+import rawSvg from "@ui/assets/vite.svg?raw";
 
 import { Button } from "@ui/components/Button";
 import "@ui/styles/main.scss";
@@ -52,6 +53,14 @@ function App() {
         >
           create square
         </Button>
+          <Button
+            onClick={() =>
+                NetworkMessages.ADD_BLACK_LAYER.send({ color: { r: 0, b: 0, g: 0 }, svg: rawSvg })
+          }
+            style={{marginInlineStart:  10}}
+          >
+              Add black layer
+          </Button>
         <p>
           Edit <code>src/app.tsx</code> and save to test HMR
         </p>
