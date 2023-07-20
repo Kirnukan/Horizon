@@ -25,20 +25,56 @@ export class AddBlackLayerMessage extends Networker.MessageType<Payload> {
                 blackLayer.fills = [{ type: "SOLID", color: payload.color }];
                 node.appendChild(blackLayer);
 
-                const imageLayer = figma.createRectangle();
-                imageLayer.x = 0;
-                imageLayer.y = 0;
-                imageLayer.resize(node.width, node.height);
-                imageLayer.fills = []; // Set to empty array for full transparency
-                node.appendChild(imageLayer);
+
+
 
                 // Create SVG node from raw SVG string
                 const svgNode = figma.createNodeFromSvg(payload.svg);
-                svgNode.x = 0;
-                svgNode.y = 0;
-                svgNode.resize(node.width, node.height);
+
+                // Get the original dimensions of the SVG
+                const originalWidth = svgNode.width;
+                const originalHeight = svgNode.height;
+
+                // Determine the aspect ratio of the SVG
+                const aspectRatio = originalWidth / originalHeight;
+
+                // Determine the new dimensions based on the frame shape
+                let newWidth, newHeight;
+                if (node.width === node.height) {  // Square frame
+                    newWidth = newHeight = Math.min(node.width, node.height);
+                } else if (node.height > node.width) {  // Vertical frame
+                    newWidth = node.width;
+                    newHeight = newWidth / aspectRatio;
+                } else {  // Horizontal frame
+                    newHeight = node.height;
+                    newWidth = newHeight * aspectRatio;
+                }
+
+                // Calculate the center position
+                const centerX = (node.width - newWidth) / 2;
+                const centerY = (node.height - newHeight) / 2;
+
+                svgNode.x = centerX;
+                svgNode.y = centerY;
+                svgNode.resize(newWidth, newHeight);
                 svgNode.fills = []; // Set to empty array for full transparency
                 node.appendChild(svgNode);
+
+
+                // const imageLayer = figma.createRectangle();
+                // imageLayer.x = 0;
+                // imageLayer.y = 0;
+                // imageLayer.resize(node.width, node.height);
+                // imageLayer.fills = []; // Set to empty array for full transparency
+                // node.appendChild(imageLayer);
+
+                // // Create SVG node from raw SVG string
+                // const svgNode = figma.createNodeFromSvg(payload.svg);
+                // svgNode.x = 0;
+                // svgNode.y = 0;
+                // svgNode.resize(node.width, node.height);
+                // svgNode.fills = []; // Set to empty array for full transparency
+                // node.appendChild(svgNode);
             }
         }
 
