@@ -8,9 +8,9 @@ async function bootstrap() {
 
   if (figma.editorType === "figma") {
     figma.showUI(__html__, {
-      width: 800,
-      height: 650,
-      title: "My Figma Plugin!",
+      width: 401,
+      height: 679,
+      title: "Horizon",
     });
   } else if (figma.editorType === "figjam") {
     figma.showUI(__html__, {

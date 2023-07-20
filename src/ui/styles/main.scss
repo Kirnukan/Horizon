@@ -1,19 +1,111 @@
-// 1. Configuration and helpers
-@import "abstracts/variables";
-
-// 2. Vendors
+//// 1. Configuration and helpers
+//@import "abstracts/variables";
+//
+//// 2. Vendors
 @import "vendors/normalize";
-
-// 3. Base stuff
-@import "base/base";
-@import "base/fonts";
-@import "base/typography";
+//
+//// 3. Base stuff
+//@import "base/base";
+//@import "base/fonts";
+//@import "base/typography";
 
 // 4. Layout-related sections
 
 // 5. Components
 
+
+
 // 6. Page-specific styles
-@import "pages/home";
+//@import "pages/home";
 
 // 7. Themes
+.homepage {
+  // Добавьте все необходимые стили для .homepage здесь
+
+  .panels-container {
+    display: flex;
+    justify-content: space-between;
+
+    .left-panel {
+      width: 342px;
+      //height: 605px;
+      background: linear-gradient(0deg, #FFFFFF, #FFFFFF), linear-gradient(0deg, #F2F2F2, #F2F2F2);
+      padding-top: 14px;
+      .tabs {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 10px;
+
+        .tab {
+          padding: 4px 6px 4px 6px;
+          border-radius: 2px;
+          margin-bottom: 10px;
+          color: white;
+          font-family: Stapel, serif;
+          font-size: 8px;
+          font-weight: 900;
+          line-height: 10px;
+          letter-spacing: 0em;
+          width: 77px;
+          height: 18px;
+          background: #C3CCE5;
+
+          &.active {
+            background: #737C99;
+          }
+        }
+      }
+
+      .tabs-content {
+        //height: calc(100% - 50px);
+        overflow-y: auto;
+
+        .tab-content {
+          display: none;
+        }
+      }
+    }
+
+    .right-panel {
+      // Стили для .right-panel здесь
+      width: 59px;
+      background-color: #F2F2F2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 5px 0 10px;
+
+
+      .elements {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .element, .button, .big-button {
+          width: 44px;
+          background-color: #fff;
+        }
+
+        .element {
+          height: 44px;
+        }
+
+        .button {
+          height: 30px;
+          background-color: #c3cce5;
+          &:hover {
+            background-color: #737C99;
+          }
+        }
+
+        .big-button {
+          height: 44px;
+          background-color: #c3cce5;
+          &:hover {
+            background-color: #737C99;
+          }
+        }
+      }
+    }
+  }
+}
