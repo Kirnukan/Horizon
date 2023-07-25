@@ -16,6 +16,8 @@
     }
   },
   "dependencies": {
+    "d3": "^7.8.5",
+    "jsdom": "^22.1.0",
     "monorepo-networker": "^1.5.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
@@ -23,6 +25,8 @@
   "devDependencies": {
     "@figma/plugin-typings": "^1.62.0",
     "@svgr/core": "^6.5.1",
+    "@types/d3": "^7.4.0",
+    "@types/jsdom": "^21.1.1",
     "@types/node": "^18.15.11",
     "@types/postcss-url": "^10.0.0",
     "@types/react": "^18.0.28",

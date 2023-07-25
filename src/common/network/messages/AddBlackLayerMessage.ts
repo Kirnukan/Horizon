@@ -4,9 +4,10 @@ import * as Networker from "monorepo-networker";
 // import MyImage from "@ui/assets/vite.svg?raw";
 
 interface Payload {
-    color: { r: 0, g: 0, b: 0 };
+    // color: { r: 0, g: 0, b: 0 };
     svg: string;
 }
+
 
 export class AddBlackLayerMessage extends Networker.MessageType<Payload> {
     public receivingSide(): Networker.Side {
@@ -15,25 +16,29 @@ export class AddBlackLayerMessage extends Networker.MessageType<Payload> {
 
     public handle(payload: Payload, from: Networker.Side): void {
         const nodes = figma.currentPage.selection;
-
+        let svgString = payload.svg
+        // .replace(/#FF5500/g, '#177541')
+        //                            .replace(/#FFFFFF/g, '#7074A0')
+        //                            .replace(/#9A2500/g, '#7074FF')
         for (const node of nodes) {
             if ("children" in node && node.type === "FRAME") {
-                const blackLayer = figma.createRectangle();
-                blackLayer.x = 0;
-                blackLayer.y = 0;
-                blackLayer.resize(node.width, node.height);
-                blackLayer.fills = [{ type: "SOLID", color: payload.color }];
-                node.appendChild(blackLayer);
+                // const blackLayer = figma.createRectangle();
+                // blackLayer.x = 0;
+                // blackLayer.y = 0;
+                // blackLayer.resize(node.width, node.height);
+                // blackLayer.fills = [{ type: "SOLID", color: payload.color }];
+                // node.appendChild(blackLayer);
 
 
 
 
                 // Create SVG node from raw SVG string
-                const svgNode = figma.createNodeFromSvg(payload.svg);
+                const svgNode = figma.createNodeFromSvg(svgString);
 
                 // Get the original dimensions of the SVG
                 const originalWidth = svgNode.width;
                 const originalHeight = svgNode.height;
+                
 
                 // Determine the aspect ratio of the SVG
                 const aspectRatio = originalWidth / originalHeight;
@@ -78,6 +83,6 @@ export class AddBlackLayerMessage extends Networker.MessageType<Payload> {
             }
         }
 
-        figma.closePlugin();
+        // figma.closePlugin();
     }
 }

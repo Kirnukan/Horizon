@@ -61,9 +61,54 @@
         overflow-y: auto;
 
         .tab-content {
-          display: none;
+          display: flex;
         }
       }
+      .pallete {
+        display: flex;
+        padding: 5px 5px 5px 10px;
+        justify-content: space-between;
+        align-items: center;
+        flex: 1 0 0;
+        color: var(--unnamed, #000);
+        font-family: Stapel;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+        border-radius: 2px;
+        border: 1px solid var(--ii, #F7F7F7);
+        background: var(--unnamed, #FFF);
+        &-colors {
+          display: flex;
+          align-items: flex-start;
+          gap: 2px;
+        }
+      }
+      .pallete-button {
+        width: 22px;
+        height: 22px;
+        border-radius: 100%;
+        border: 1px solid #F2F2F2; /* Change border color here */
+        padding: 0;
+        -webkit-appearance: none; /* Remove default input styling */
+        -moz-appearance: none;
+        appearance: none;
+        background: transparent; /* Set the background to be transparent */
+        outline: none; /* Remove the outline */
+        box-shadow: none; /* Remove the shadow */
+        cursor: pointer; /* Change the cursor to be a pointer */
+      }
+      
+      .pallete-button::-webkit-color-swatch-wrapper {
+        padding: 0; /* Remove padding from color swatch wrapper */
+      }
+      
+      .pallete-button::-webkit-color-swatch {
+        border: none; /* Remove border from color swatch */
+        border-radius: 100%; /* Set the border radius to be circular */
+      }
+      
     }
 
     .right-panel {

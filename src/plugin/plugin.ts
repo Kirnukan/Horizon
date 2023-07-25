@@ -11,6 +11,7 @@ async function bootstrap() {
       width: 401,
       height: 679,
       title: "Horizon",
+      visible: true,
     });
   } else if (figma.editorType === "figjam") {
     figma.showUI(__html__, {
