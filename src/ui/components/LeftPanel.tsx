@@ -154,6 +154,9 @@ import React, { useState } from "react";
 import { Button } from "./Button";
 import { NetworkMessages } from "@common/network/messages";
 import rawSvg from "@ui/assets/Biblio/Simple/type-1_1.svg?raw";
+import TypeDropdown from "./TypeDropdown";
+import SimpleDropdown from "./Dropdown";
+import groupsUtil from "@ui/utils/groups.util";
 
 interface TabProps {
   id: string;
@@ -180,14 +183,17 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ activeTab, onTabChange }) => {
         // .replace(/#FF5500/g, '#177541')
         //                            .replace(/#FFFFFF/g, '#7074A0')
         //                            .replace(/#9A2500/g, '#7074FF')
-  const handleButtonClick = () => {
-    let svgString = rawSvg
-      .replace(/#FF5500/g, color1)
-      .replace(/#FFFFFF/g, color2).replace(/white/g, color2)
-      .replace(/#9A2500/g, color3);
-    NetworkMessages.ADD_BLACK_LAYER.send({ svg: svgString });
-  };
-
+const handleButtonClick = (svgString: string) => {
+  let svg = svgString
+    .replace(/#FF5500/g, color1)
+    .replace(/#FFFFFF/g, color2).replace(/white/g, color2)
+    .replace(/#9A2500/g, color3);
+  NetworkMessages.ADD_BLACK_LAYER.send({ svg });
+};
+const svgString = rawSvg
+  .replace(/#FF5500/g, color1)
+  .replace(/#FFFFFF/g, color2).replace(/white/g, color2)
+  .replace(/#9A2500/g, color3);
   const renderTabContent = (tabId: string) => {
     switch (tabId) {
       case 'frames':
@@ -216,12 +222,59 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ activeTab, onTabChange }) => {
                 />
               </div>
             </div>
-            <Button
+            <div className="dropdown-container">
+              <SimpleDropdown title="Simple">
+                <div className="type-dropdown-container">
+                  <TypeDropdown 
+                    title="Image 1" 
+                    imageActive={groupsUtil.imageActive1}
+                    imagePassive={groupsUtil.imagePassive1}
+                    buttons={[{ svg: svgString, onClick: () => handleButtonClick(svgString) },
+                              { svg: svgString, onClick: () => handleButtonClick(svgString) },
+                              { svg: svgString, onClick: () => handleButtonClick(svgString) },
+                              { svg: svgString, onClick: () => handleButtonClick(svgString) },
+                              { svg: svgString, onClick: () => handleButtonClick(svgString) },
+                              { svg: svgString, onClick: () => handleButtonClick(svgString) },
+                              { svg: svgString, onClick: () => handleButtonClick(svgString) }]}
+                  />
+                  <TypeDropdown 
+                    title="Image 2" 
+                    imageActive={groupsUtil.imageActive2}
+                    imagePassive={groupsUtil.imagePassive2}
+                    buttons={[{ svg: svgString, onClick: () => handleButtonClick(svgString) }]}
+                  />
+                  <TypeDropdown 
+                    title="Image 3" 
+                    imageActive={groupsUtil.imageActive3}
+                    imagePassive={groupsUtil.imagePassive3}
+                    buttons={[{ svg: svgString, onClick: () => handleButtonClick(svgString) }]}
+                  />
+                  <TypeDropdown 
+                    title="Image 4" 
+                    imageActive={groupsUtil.imageActive4}
+                    imagePassive={groupsUtil.imagePassive4}
+                    buttons={[{ svg: svgString, onClick: () => handleButtonClick(svgString) }]}
+                  />
+                  <TypeDropdown 
+                    title="Image 5" 
+                    imageActive={groupsUtil.imageActive5}
+                    imagePassive={groupsUtil.imagePassive5}
+                    buttons={[{ svg: svgString, onClick: () => handleButtonClick(svgString) }]}
+                  />
+                </div>
+              </SimpleDropdown>
+
+              <SimpleDropdown title="Button 2">
+              </SimpleDropdown>
+            </div>
+
+
+            {/* <Button
               onClick={handleButtonClick}
               style={{ marginInlineStart: 10 }}
             >
               Add image
-            </Button>
+            </Button> */}
           </div>
         );
 
