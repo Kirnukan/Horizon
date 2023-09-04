@@ -10,6 +10,8 @@ interface TypeDropdownProps {
     svg: string;
     onClick: () => void;
   }[];
+  isOpen: boolean;
+  onOpen: () => void;
 }
 
 const TypeDropdown: React.FC<TypeDropdownProps> = ({
@@ -17,11 +19,13 @@ const TypeDropdown: React.FC<TypeDropdownProps> = ({
   imageActive,
   imagePassive,
   buttons,
+  isOpen,
+  onOpen,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  // const [isOpen, setIsOpen] = useState(false);
 
   const handleDropdownClick = () => {
-    setIsOpen(!isOpen);
+    onOpen();
   };
 
   const handleButtonClick = (onClick: () => void) => {
@@ -60,6 +64,7 @@ const TypeDropdown: React.FC<TypeDropdownProps> = ({
           ))}
         </div>
       )}
+      {/* {isOpen && <div className="buttons-placeholder"></div>} */}
     </div>
   );
 };

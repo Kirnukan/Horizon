@@ -4,6 +4,8 @@ import * as Networker from "monorepo-networker";
 interface Payload {
   width: number;
   height: number;
+  x: number;  // добавьте координату x
+  y: number;  // добавьте координату y
 }
 
 export class CreateRectMessage extends Networker.MessageType<Payload> {
@@ -14,8 +16,8 @@ export class CreateRectMessage extends Networker.MessageType<Payload> {
   public handle(payload: Payload, from: Networker.Side): void {
     if (figma.editorType === "figma") {
       const rect = figma.createRectangle();
-      rect.x = 0;
-      rect.y = 0;
+      rect.x = payload.x;  // установите координату x из payload
+      rect.y = payload.y;  // установите координату y из payload
       rect.name = "Plugin Rectangle # " + Math.floor(Math.random() * 9999);
       rect.fills = [
         {

@@ -4,6 +4,8 @@ import { PingMessage } from "@common/network/messages/PingMessage";
 import { NetworkSide } from "@common/network/sides";
 import * as Networker from "monorepo-networker";
 import {AddBlackLayerMessage} from "@common/network/messages/AddBlackLayerMessage";
+import {CleanFramesMessage} from "@common/network/messages/CleanFramesMessage";
+
 
 export namespace NetworkMessages {
   export const registry = new Networker.MessageTypeRegistry();
@@ -22,5 +24,9 @@ export namespace NetworkMessages {
 
   export const ADD_BLACK_LAYER = registry.register(
       new AddBlackLayerMessage("add-black-layer")
+  )
+
+  export const CLEAN_FRAMES = registry.register(
+    new CleanFramesMessage("clean-frames")
   )
 }

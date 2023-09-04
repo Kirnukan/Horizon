@@ -25,6 +25,7 @@
   .panels-container {
     display: flex;
     justify-content: space-between;
+    // position: relative;
 
     .left-panel {
       width: 342px;
@@ -33,27 +34,43 @@
       padding-top: 14px;
       padding-left: 14px;
       padding-right: 14px;
+      overflow-y: hidden;
+      max-height: 617px;
+      overflow-y: auto;
+
       
       .tabs {
         display: flex;
-        justify-content: space-between;
-        // padding: 0 10px;
-        gap: 2px;
+        // justify-content: space-between;
+        // // padding: 0 10px;
+        // gap: 2px;
     
         .tab {
-          padding: 4px 6px 4px 6px;
-          border-radius: 2px;
+          display: flex;
+          padding: 7px 6px 6px 6px;
+          // border-radius: 2px;
           margin-bottom: 10px;
           color: white;
           font-family: Stapel, serif;
-          font-size: 8px;
+          font-size: 10px;
           font-weight: 400;
           line-height: 10px;
           letter-spacing: 0em;
           border-width: 0;
           width: 77px;
-          height: 18px;
+          height: 25px;
           background: #C3CCE5;
+          justify-content: center;
+          align-items: center;
+          gap: 10px;
+          flex: 1 0 0;
+
+          &:first-child {
+            border-radius: 6px 0px 0px 0px;
+          }
+          &:last-child {
+            border-radius: 0px 6px 0px 0px;
+          }
 
           &.active {
             background: #737C99;
@@ -63,7 +80,8 @@
 
       .tabs-content {
         //height: calc(100% - 50px);
-        overflow-y: auto;
+        // overflow-y: auto;
+
 
         .tab-content {
           display: flex;
@@ -76,6 +94,60 @@
           
         }
       }
+
+
+    .search-container {
+        position: relative;
+        width: 100%;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #E5ECFF;
+        font-size: 12px;
+        font-family: Stapel, serif;
+        outline: none;
+        transition: border-color 0.3s ease;
+        margin-top: -10px;
+        border-radius: 0 0 5px 5px;
+        text-align: center;
+        box-sizing: border-box;
+        padding-right: 20px;
+    
+        &:focus {
+            border-color: #C3CCE5;
+        }
+    
+        &::placeholder {
+            color: var(--IX, #C3CCE5);
+            opacity: 1;
+            font-family: Stapel;
+            font-size: 12px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: normal;
+            text-align: center;
+        }
+    
+        &:not(:placeholder-shown) + .search-icon path {
+            fill: red;
+        }
+    }
+    
+    .search-icon {
+        position: absolute;
+        top: 30%;
+        // right: 15px; /* расположение иконки от правого края поля ввода */
+        transform: translateY(-50%);
+        pointer-events: none; /* чтобы иконка не перехватывала события мыши */
+    }
+    
+    
+    
+    
+    
+
       .pallete {
         display: flex;
         width: 191px;
@@ -123,41 +195,35 @@
         border-radius: 100%; /* Set the border radius to be circular */
       }
       .dropdown-container {
-        width: 100%; // ensure the container takes up full width
+        width: 100%;
         display: flex;
-        flex-direction: row;
         flex-wrap: wrap;
-        gap: 10px; 
+        gap: 10px;
+      }
+      
+      .simple-dropdown {
+        flex: 1 0 152px;
+        border-radius: 6px 6px 0px 0px;
+        border: 1px solid #F7F7F7;
+        background: #FFF;
         
-        .simple-dropdown {
-          // flex: 0 0 48%; // allows two items per row when closed
-          // max-width: 48%; // allows two items per row when closed
-          width: 152px;
-          border-radius: 6px 6px 0px 0px;
-          border: 1px solid #F7F7F7;
-          background: #FFF;
-          // padding: 3px 6px 2px 6px;
-
-          &.open {
-            // flex: 0 0 100%; // allows one item per row when opened
-            // max-width: 100%; // allows one item per row when opened
-            width: 314px;
-            
-            border-radius: 6px 6px 0px 0px;
-            background: #292F40;
-            .dropdown-content {
-              display: flex;
-              flex-wrap: wrap;
-              justify-content: space-between; // spaces out TypeDropdowns
-              background: var(--unnamed, #FFF);
-              padding: 15px 0 ;
-              padding-left: 15px;
-            }
-            .dropdown-header {
-              color: var(--unnamed, #FFF);
-              
-            }
+        &.open {
+          flex: 1 0 100%;
+          background: #292F40;
+          
+          .dropdown-content {
+            // display: flex;
+            // flex-wrap: wrap;
+            gap: 4px;
+            background: var(--unnamed, #FFF);
+            padding: 15px;
           }
+          
+          .dropdown-header {
+            color: var(--unnamed, #FFF);
+          }
+        }
+      }
       
           .dropdown-header {
             padding: 3px 6px;
@@ -186,16 +252,11 @@
             }
           }
           .type-dropdown-container {
-            display: flex;
-            flex-direction: row; // изменим на row для отображения элементов в ряд
-            flex-wrap: wrap; // разрешим перенос на новую строку
-            // justify-content: center;
-            // align-items: center;
-            padding-bottom: 0px;
-            // border-radius: 4px;
-            // border: 1px solid #F2F2F2;
-            background: #FFF;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
             gap: 4px;
+            background: #FFF;
+            padding-bottom: 0px;
           }
           .type-dropdown {
             display: flex;
@@ -207,27 +268,60 @@
             border-radius: 4px;
             border: 1px solid #F2F2F2;
             background: #FFF;
-      
+            margin-bottom: 15px;
             &.open {
               border: 2px solid #66B2FF;
               background: #FFF;
+              grid-column: 1 / -1; // Занимает весь ряд, начиная от первой ячейки
+
             }
           }
       
-
+          .type-dropdown-header-icon {
+            max-width: 92px;
+            border-radius: 6px;
+          }
         }
       }
       .type-dropdown-wrapper {
         display: flex;
         flex-direction: column;
+      
+        &:nth-child(3n+1) { 
+          align-items: flex-start;
+          // margin-left: -15px;
+          .buttons {
+            margin-left: -15px; 
+          }
+        }
+      
+        &:nth-child(3n+2) { 
+          align-items: center;
+          
+          // .buttons {
+          //   // margin-left: -5px;
+          // }
+        }
+      
+        &:nth-child(3n) { 
+          align-items: flex-end;
+          .buttons {
+            padding: 15px;
+            margin-right: -16px;
+          }
+        }
       }
       
       .buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 4px;
-        
-        // добавьте другие стили по мере необходимости
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+        gap: 5px;
+        background-color: #F2F2F2;
+        padding: 15px;
+        margin-bottom: 15px;
+        min-width: 284px;
+        // padding-right: 20px;
+        z-index: 1000;
       }
       .dropdown-button {
         max-width: 44px;
@@ -235,12 +329,20 @@
         display: flex; /* Сделать контейнер кнопки гибким для корректного выравнивания SVG */
         align-items: center; /* Центрировать SVG по вертикали */
         justify-content: center; /* Центрировать SVG по горизонтали */
+        padding: 0;
+        border-width: 0;
+        border-radius: 4px;
+
       }
       
       .dropdown-button img { /* Селектор для SVG внутри кнопки */
         max-width: 100%; /* Максимальная ширина SVG - 100% ширины кнопки */
         max-height: 100%; /* Максимальная высота SVG - 100% высоты кнопки */
         object-fit: contain; /* Обеспечивает, что SVG будет масштабировано с сохранением пропорций, чтобы его размеры не превышали размеры кнопки */
+        border-radius: 6px;
+        &:hover {
+          border: 2px solid var(--i, #66B2FF);
+        }
       }
       
       
@@ -254,24 +356,28 @@
       flex-direction: column;
       align-items: center;
       padding: 5px 0 10px;
-
+      max-height: 616px;
+      position: sticky;
+      top: 0;
+      right: 0;
 
       .elements {
         display: flex;
         flex-direction: column;
-        gap: 10px;
-
+        gap: 8px;
         .element, .button, .big-button {
           width: 44px;
           background-color: #fff;
+          border-radius: 4px;
         }
 
         .element {
           height: 44px;
+          
         }
 
         .button {
-          height: 30px;
+          height: 44px;
           background-color: #c3cce5;
           &:hover {
             background-color: #737C99;
@@ -281,11 +387,36 @@
         .big-button {
           height: 44px;
           background-color: #c3cce5;
-          &:hover {
-            background-color: #737C99;
-          }
         }
+        .button.big-button:hover svg rect {
+          fill: #737C99;
+        }
+      
       }
     }
-  }
+/* Стили для полосы прокрутки */
+.left-panel::-webkit-scrollbar {
+  width: 4px; /* Ширина полосы */
+
+}
+
+/* Стили для трека полосы прокрутки */
+.left-panel::-webkit-scrollbar-track {
+  background-color: transparent; /* Цвет фона трека */
+}
+
+/* Стили для ползунка полосы прокрутки */
+.left-panel::-webkit-scrollbar-thumb {
+  background-color: #C3CCE5; /* Цвет ползунка */
+  // border-radius: 2px; /* Закругление углов ползунка */
+}
+
+/* Убираем стрелки вверх и вниз на полосе прокрутки */
+.left-panel::-webkit-scrollbar-button {
+  display: none;
+}
+
+/* Стили для трека полосы прокрутки */
+.left-panel::-webkit-scrollbar-track {
+  background-color: #F2F2F2; /* Цвет фона трека */
 }

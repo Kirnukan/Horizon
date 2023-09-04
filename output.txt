@@ -1,0 +1,128 @@
+
+D:.
+│   .gitignore
+│   figma.manifest.ts
+│   output.txt
+│   package-lock.json
+│   package.json
+│   README.md
+│   tsconfig.json
+│   tsconfig.node.json
+│   vite.config.plugin.ts
+│   vite.config.ui.ts
+│   
+├───.github
+│   │   FUNDING.yml
+│   │   
+│   └───assets
+│           logo.png
+│           preview.png
+│           
+├───.idea
+│   │   .gitignore
+│   │   Horizon.iml
+│   │   modules.xml
+│   │   vcs.xml
+│   │   workspace.xml
+│   │   
+│   └───inspectionProfiles
+│           Project_Default.xml
+│           
+├───dist
+│   │   index.html
+│   │   manifest.json
+│   │   plugin.js
+│   │   
+│   └───assets
+│           vite-4a748afd.svg
+│           
+         
+├───scripts
+│   │   last_plugin.figma.vbs
+│   │   
+│   └───vite
+│           vite-inline-svg.ts
+│           vite-svgr-component.ts
+│           
+└───src
+    ├───common
+    │   └───network
+    │       │   init.ts
+    │       │   messages.ts
+    │       │   sides.ts
+    │       │   
+    │       └───messages
+    │               AddBlackLayerMessage.ts
+    │               CleanFramesMessage.ts
+    │               CreateRectMessage.ts
+    │               HelloMessage.ts
+    │               PingMessage.ts
+    │               
+    ├───plugin
+    │       plugin.ts
+    │       
+    └───ui
+        │   app.tsx
+        │   index.html
+        │   main.tsx
+        │   vite-env.d.ts
+        │   
+        ├───assets
+        │   │   figma.png
+        │   │   react.svg
+        │   │   vite.svg
+        │   │   
+        │   ├───Biblio
+        │   │   └───Simple
+        │   │           type-1_1.svg
+        │   │           type-1_2.svg
+        │   │           type-1_3.svg
+        │   │           type-1_4.svg
+        │   │           type-1_5.svg
+        │   │           type-1_6.svg
+        │   │           
+        │   ├───fonts
+        │   │       Alkatra.ttf
+        │   │       
+        │   └───GroupImages
+        │           group_active_01.jpg
+        │           group_active_02.jpg
+        │           group_active_03.jpg
+        │           group_active_04.jpg
+        │           group_active_05.jpg
+        │           group_passive_01.jpg
+        │           group_passive_02.jpg
+        │           group_passive_03.jpg
+        │           group_passive_04.jpg
+        │           group_passive_05.jpg
+        │           
+        ├───components
+        │       Button.module.scss
+        │       Button.tsx
+        │       Dropdown.tsx
+        │       LeftPanel.tsx
+        │       RightPanel.tsx
+        │       TypeDropdown.tsx
+        │       
+        ├───styles
+        │   │   main.scss
+        │   │   
+        │   ├───abstracts
+        │   │       _variables.scss
+        │   │       
+        │   ├───base
+        │   │       _base.scss
+        │   │       _fonts.scss
+        │   │       _typography.scss
+        │   │       
+        │   ├───pages
+        │   │       _home.scss
+        │   │       
+        │   └───vendors
+        │           _normalize.scss
+        │           
+        └───utils
+                classes.util.ts
+                forms.util.ts
+                groups.util.ts
+                

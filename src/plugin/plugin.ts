@@ -9,7 +9,7 @@ async function bootstrap() {
   if (figma.editorType === "figma") {
     figma.showUI(__html__, {
       width: 401,
-      height: 679,
+      height: 631,
       title: "Horizon",
       visible: true,
     });

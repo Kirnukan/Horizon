@@ -1,18 +1,38 @@
-// Dropdown.tsx
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useState, useEffect } from 'react';
 // import './SimpleDropdown.scss'; // Стили для SimpleDropdown
 
 interface SimpleDropdownProps {
   title: string;
-  children: ReactNode;
+  children: ReactNode | ReactNode[];
 }
 
 function SimpleDropdown({ title, children }: SimpleDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [openDropdowns, setOpenDropdowns] = useState<Record<number, boolean>>({});
+
+  const handleDropdownOpen = (id: number) => {
+    setOpenDropdowns(prev => ({...prev, [id]: !prev[id]}));
+  };
+
   const toggleOpen = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.stopPropagation(); // останавливаем всплытие события
-    setIsOpen(!isOpen);
+    const newState = !isOpen;
+    setIsOpen(newState);
+    
+    // Если меню закрывается, закрываем все внутренние списки.
+    if (!newState) {
+      setOpenDropdowns({});
+    }
   };
+
+  const dropdowns = React.Children.map(children, (child, index) => {
+    // Обязательно передайте `key`, `isOpen` и `onOpen` каждому `TypeDropdown`.
+    return React.cloneElement(child as React.ReactElement, {
+      key: index,
+      isOpen: openDropdowns[index] || false,
+      onOpen: () => handleDropdownOpen(index),
+    });
+  });
 
   return (
     <div onClick={toggleOpen} className={`simple-dropdown ${isOpen ? 'open' : 'closed'}`}>
@@ -21,7 +41,7 @@ function SimpleDropdown({ title, children }: SimpleDropdownProps) {
         <path d="M0 0L7 4.5L0 9L0 0Z" fill={isOpen ? "#FFFFFF" : "#CCCCCC"}/>
       </svg>
       </div>
-      {isOpen && <div className="dropdown-content" onClick={(e) => e.stopPropagation()}>{children}</div>}
+      {isOpen && <div className="dropdown-content" onClick={(e) => e.stopPropagation()}>{dropdowns}</div>}
     </div>
   );
 }
