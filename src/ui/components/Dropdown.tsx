@@ -3,8 +3,9 @@ import React, { ReactNode, useState, useEffect } from 'react';
 
 interface SimpleDropdownProps {
   title: string;
-  children: ReactNode | ReactNode[];
+  children?: ReactNode | ReactNode[];
 }
+
 
 function SimpleDropdown({ title, children }: SimpleDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);

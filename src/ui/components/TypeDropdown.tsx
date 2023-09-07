@@ -1,15 +1,13 @@
-// TypeDropdown.tsx
-import React, { ReactNode, useState } from 'react';
-// import './TypeDropdown.scss'; // Стили для TypeDropdown
+import React, { useState, useEffect } from 'react';
+import { getImagesByFamilyGroupAndSubgroup } from "@common/network/api";
 
 interface TypeDropdownProps {
   title: string;
   imageActive: string;
   imagePassive: string;
-  buttons: {
-    svg: string;
-    onClick: () => void;
-  }[];
+  family: string;
+  group: string;
+  subgroup: string;
   isOpen: boolean;
   onOpen: () => void;
 }
@@ -18,20 +16,32 @@ const TypeDropdown: React.FC<TypeDropdownProps> = ({
   title,
   imageActive,
   imagePassive,
-  buttons,
+  family,
+  group,
+  subgroup,
   isOpen,
   onOpen,
 }) => {
-  // const [isOpen, setIsOpen] = useState(false);
+
+  const [buttons, setButtons] = useState<{ thumb_path: string, file_path: string }[]>([]);
+
+  useEffect(() => {
+    if (isOpen) {
+      const fetchImages = async () => {
+        try {
+          const images = await getImagesByFamilyGroupAndSubgroup(family, group, subgroup);
+          setButtons(images.map(img => ({ thumb_path: img.thumb_path, file_path: img.file_path })));
+        } catch (error) {
+          console.error('Failed to load images:', error);
+        }
+      };
+
+      fetchImages();
+    }
+  }, [isOpen, family, group, subgroup]);
 
   const handleDropdownClick = () => {
     onOpen();
-  };
-
-  const handleButtonClick = (onClick: () => void) => {
-    onClick();
-    // Не нужно менять состояние isOpen при нажатии на кнопку
-    // setIsOpen(false);
   };
 
   return (
@@ -54,17 +64,17 @@ const TypeDropdown: React.FC<TypeDropdownProps> = ({
             <button
               key={index}
               className="dropdown-button"
+              style={{ backgroundImage: `url(${button.thumb_path})` }}
               onClick={(event) => {
-                event.stopPropagation(); // Остановите всплытие события
-                handleButtonClick(button.onClick);
+                event.stopPropagation();
               }}
             >
-              <img src={`data:image/svg+xml,${encodeURIComponent(button.svg)}`} />
+              {/* Если SVG, отображаем как изображение; иначе просто пустая кнопка с фоном */}
+              {button.file_path.endsWith('.svg') && <img src={button.file_path} />}
             </button>
           ))}
         </div>
       )}
-      {/* {isOpen && <div className="buttons-placeholder"></div>} */}
     </div>
   );
 };

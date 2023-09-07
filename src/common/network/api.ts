@@ -1,48 +1,96 @@
 const BASE_URL = 'http://localhost:8080';
 
+function nameToUrl(name: string): string {
+  return name.replace(/_/g, '/');
+}
+
+const transformImagesData = (data: any[]) => {
+  return data.map(image => ({
+    ...image,
+    nameUrl: nameToUrl(image.name)  // Предполагая, что у вас уже есть функция nameToUrl
+  }));
+};
+
+
+
+// Создаем URL на основе параметров
+const createUrl = (path: string, params?: Record<string, string | number>) => {
+  const url = new URL(path, BASE_URL);
+  if (params) {
+    Object.entries(params)
+      .filter(([, value]) => value !== undefined)  // Исключаем параметры со значением undefined
+      .forEach(([key, value]) => {
+        url.searchParams.set(key, String(value));
+      });
+  }
+  return url.toString();
+};
+
+function capitalizeFirstLetter(string: string): string {
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}
+
+
 // 1. Получение изображений по семейству и группе
-export const getImagesByFamilyAndGroup = async (family: string, group: string) => {
-  const response = await fetch(`${BASE_URL}/${family}/${group}/`);
+export const getImagesByFamilyGroupAndSubgroup = async (family: string, group: string, subgroup: string) => {
+  const capitalizedFamily = capitalizeFirstLetter(family);
+  const capitalizedGroup = capitalizeFirstLetter(group);
+  const capitalizedSubgroup = capitalizeFirstLetter(subgroup);
+  
+  const response = await fetch(createUrl(`/${capitalizedFamily}/${capitalizedGroup}/${capitalizedSubgroup}/`));
+
   if (!response.ok) {
-    throw new Error('Failed to fetch images.');
+    const errorMessage = await response.text();
+    throw new Error(`Failed to fetch images. ${errorMessage}`);
+  }
+  const data = await response.json();
+  return transformImagesData(data);
+};
+
+
+// 2. Получение изображения по семейству, группе и номеру
+export const getImageByFamilyGroupSubgroupAndNumber = async (family: string, group: string, subgroup: string, number: number) => {
+  const capitalizedFamily = capitalizeFirstLetter(family);
+  const capitalizedGroup = capitalizeFirstLetter(group);
+  const capitalizedSubgroup = capitalizeFirstLetter(subgroup);
+  
+  const response = await fetch(createUrl(`/${capitalizedFamily}/${capitalizedGroup}/${capitalizedSubgroup}/${number}`));
+  if (!response.ok) {
+    const errorMessage = await response.text();
+    throw new Error(`Failed to fetch the image. ${errorMessage}`);
   }
   return response.json();
 };
 
-// 2. Получение изображения по семейству, группе и номеру
-export const getImageByFamilyGroupAndNumber = async (family: string, group: string, number: number) => {
-  const response = await fetch(`${BASE_URL}/${family}/${group}/${number}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch the image.');
-  }
-  return response.json();
-};
 
 // 3. Поиск изображений по ключевому слову и семейству
 export const searchImagesByKeywordAndFamily = async (keyword: string, family?: string) => {
-  let url = `${BASE_URL}/search?keyword=${keyword}`;
+  const params: Record<string, string | number> = { keyword };
   if (family) {
-    url += `&family=${family}`;
+    params.family = family;
   }
-  const response = await fetch(url);
+  const response = await fetch(createUrl('/search', params));
   if (!response.ok) {
-    throw new Error('Failed to search images.');
+    const errorMessage = await response.text();
+    throw new Error(`Failed to search images. ${errorMessage}`);
   }
-  return response.json();
+  const data = await response.json();
+  return transformImagesData(data);
 };
 
 // 4. Получение наименее используемых изображений по семейству
 export const getLeastUsedImagesByFamily = async (family: string, count = 6) => {
-  const response = await fetch(`${BASE_URL}/least-used?family=${family}&count=${count}`);
+  const capitalizedFamily = capitalizeFirstLetter(family);
+  const response = await fetch(createUrl('/least-used', { capitalizedFamily, count }));
   if (!response.ok) {
-    throw new Error('Failed to fetch least used images.');
+    const errorMessage = await response.text();
+    throw new Error(`Failed to fetch least used images. ${errorMessage}`);
   }
-  return response.json();
+  const data = await response.json();
+  return transformImagesData(data);
 };
 
 // 5. Сервировка статических изображений
-// Эта функция может не понадобиться в API, так как это прямая ссылка на изображение. 
-// Если вам нужно только получить URL статического изображения, вы можете создать функцию для этого:
 export const getStaticImageUrl = (filename: string) => {
   return `${BASE_URL}/static/images/${filename}`;
 };
