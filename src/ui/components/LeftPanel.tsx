@@ -4,7 +4,7 @@ import svgs from '@ui/utils/forms.util';
 import TypeDropdown from "./TypeDropdown";
 import SimpleDropdown from "./Dropdown";
 import groupsUtil from "@ui/utils/groups.util";
-import { getImageByFamilyGroupSubgroupAndNumber } from "@common/network/api";
+import { getImageByFilePath } from "@common/network/api";
 import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure"; 
 
 
@@ -82,47 +82,74 @@ import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure";
     onTabChange: (tabId: string) => void;
   }
 
-  const handleImageClick = async (filePath: string): Promise<any> => {
-    // Разбор filePath для получения family, group, subgroup и number
-    const [_, family, group, subgroup, fileName] = filePath.split('/');
-    const number = parseInt(fileName.split('_').pop() || '1'); 
-  
-    // Отправка запроса к серверу
-    try {
-      const response = await getImageByFamilyGroupSubgroupAndNumber(family, group, subgroup, number);
-      return response; // Возвращаем ответ
-  
-    } catch (error) {
-      console.error('Ошибка при обработке изображения:', error);
-      throw error; // Перебрасываем ошибку, чтобы она могла быть обработана в вызывающей функции
-    }
-  };
+
+
 
   const LeftPanel: React.FC<LeftPanelProps> = ({ activeTab, onTabChange }) => {
     const tabs = ["frames", "textures", "details", "effects"];
     const [colors, setColors] = useState(["#0A64AD", "#FFFFFF", "#059DF5"]);
     const [openDropdown, setOpenDropdown] = useState<Record<string, boolean>>({});
     const [searchTerm, setSearchTerm] = useState('');
-  
-    const handleButtonClick = async (filePath: string) => {
+    const [color1, setColor1] = useState("#0A64AD");
+    const [color2, setColor2] = useState("#FFFFFF");
+    const [color3, setColor3] = useState("#059DF5");
+    const [currentSVG, setCurrentSVG] = useState<string | null>(null);
+
+    const handleImageClick = async (filePath: string): Promise<string> => {
       try {
-        const [_, family, group, subgroup, fileName] = filePath.split('/');
-        const number = parseInt(fileName.split('_').pop() || '1');
-        const response = await getImageByFamilyGroupSubgroupAndNumber(family, group, subgroup, number);
-        const svgString = response.file_path;
-        let svg = colors.reduce((acc, color, index) => {
-          const patterns = [
+          const response = await getImageByFilePath(filePath);
+  
+          // Добавляем проверку на существование объекта и свойства file_path
+          if (!response || typeof response !== 'object' || !('file_path' in response)) {
+              throw new Error("Server did not return the expected data.");
+          }
+  
+          const svgString = response.file_path;
+          console.log("SVG String:", svgString);
+          return svgString;
+      } catch (error) {
+          console.error('Ошибка при обработке изображения:', error);
+          throw error; 
+      }
+    };
+  
+  
+  
+
+    const handleButtonClick = async (filePath: string) => {
+      console.log("Button clicked:", filePath);
+      try {
+          const svgString = await handleImageClick(filePath);
+          let updatedSVG = updateSVGColors(svgString);  // Получите обновленный SVG
+          
+          // Отправка обновленного SVG в Figma
+          NetworkMessages.ADD_BLACK_LAYER.send({ svg: updatedSVG });
+  
+      } catch (error) {
+          console.error('Ошибка при отправке SVG в Figma:', error);
+      }
+  };
+  
+
+  const updateSVGColors = (svgString: string): string => {
+    let updatedSVG = colors.reduce((acc, color, index) => {
+        const patterns = [
             /#FF5500/g,
             /#FFFFFF/g, /white/g,
             /#9A2500/g
-          ];
-          return acc.replace(patterns[index], color);
-        }, svgString);
-        NetworkMessages.ADD_BLACK_LAYER.send({ svg });
-      } catch (error) {
-        console.error('Ошибка при отправке SVG в Figma:', error);
+        ];
+        return acc.replace(patterns[index], color);
+    }, svgString);
+    return updatedSVG;  // Верните обновленный SVG
+};
+
+
+
+  useEffect(() => {
+      if (currentSVG) {
+          updateSVGColors(currentSVG);
       }
-    };
+  }, [color1, color2, color3]);
     const handleOpenDropdown = (dropdownId: string) => {
       setOpenDropdown(prevState => ({
         ...prevState,
@@ -136,6 +163,31 @@ import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure";
       return (
         <div className="tab-content">
           <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+          {tabId === 'frames' && (
+                  <div className="pallete">
+                    Colors
+                    <div className="pallete-colors">
+                      <input
+                        className="pallete-button"
+                        type="color"
+                        value={color1}
+                        onChange={(e) => setColor1(e.target.value)}
+                      />
+                      <input
+                        className="pallete-button"
+                        type="color"
+                        value={color2}
+                        onChange={(e) => setColor2(e.target.value)}
+                      />
+                      <input
+                        className="pallete-button"
+                        type="color"
+                        value={color3}
+                        onChange={(e) => setColor3(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
           {tabData.groups.map((group: Group) => (
             <SimpleDropdown key={group.title} title={group.title}>
               <div className="type-dropdown-container">
@@ -150,6 +202,10 @@ import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure";
                     family={tabId}
                     group={group.title}
                     subgroup={subgroup.title}
+                    onImageClick={handleButtonClick}
+                    color1={color1}
+                    color2={color2}
+                    color3={color3}
                   />
                 ))}
               </div>

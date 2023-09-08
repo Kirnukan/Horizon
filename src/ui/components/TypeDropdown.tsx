@@ -10,6 +10,10 @@ interface TypeDropdownProps {
   subgroup: string;
   isOpen: boolean;
   onOpen: () => void;
+  onImageClick: (filePath: string) => void;
+  color1: string;
+  color2: string;
+  color3: string;
 }
 
 const TypeDropdown: React.FC<TypeDropdownProps> = ({
@@ -21,24 +25,42 @@ const TypeDropdown: React.FC<TypeDropdownProps> = ({
   subgroup,
   isOpen,
   onOpen,
+  onImageClick,
+  color1,
+  color2,
+  color3,
 }) => {
 
   const [buttons, setButtons] = useState<{ thumb_path: string, file_path: string }[]>([]);
 
+const updateSVGColors = (svgString: string) => {
+    return svgString
+        .replace(/#FF5500/g, color1)
+        .replace(/#FFFFFF/g, color2)
+        .replace(/white/g, color2)
+        .replace(/#9A2500/g, color3);
+}
+
+
   useEffect(() => {
     if (isOpen) {
-      const fetchImages = async () => {
-        try {
-          const images = await getImagesByFamilyGroupAndSubgroup(family, group, subgroup);
-          setButtons(images.map(img => ({ thumb_path: img.thumb_path, file_path: img.file_path })));
-        } catch (error) {
-          console.error('Failed to load images:', error);
-        }
-      };
+        const fetchImages = async () => {
+            try {
+                const images = await getImagesByFamilyGroupAndSubgroup(family, group, subgroup);
+                const updatedImages = images.map(img => {
+                    const updatedSVG = updateSVGColors(img.file_path);
+                    return { thumb_path: img.thumb_path, file_path: updatedSVG };
+                });
+                setButtons(updatedImages);
+            } catch (error) {
+                console.error('Failed to load images:', error);
+            }
+        };
 
-      fetchImages();
+        fetchImages();
     }
   }, [isOpen, family, group, subgroup]);
+
 
   const handleDropdownClick = () => {
     onOpen();
@@ -67,9 +89,9 @@ const TypeDropdown: React.FC<TypeDropdownProps> = ({
               style={{ backgroundImage: `url(${button.thumb_path})` }}
               onClick={(event) => {
                 event.stopPropagation();
+                onImageClick(button.file_path);
               }}
             >
-              {/* Если SVG, отображаем как изображение; иначе просто пустая кнопка с фоном */}
               {button.file_path.endsWith('.svg') && <img src={button.file_path} />}
             </button>
           ))}

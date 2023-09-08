@@ -49,18 +49,17 @@ export const getImagesByFamilyGroupAndSubgroup = async (family: string, group: s
 
 
 // 2. Получение изображения по семейству, группе и номеру
-export const getImageByFamilyGroupSubgroupAndNumber = async (family: string, group: string, subgroup: string, number: number) => {
-  const capitalizedFamily = capitalizeFirstLetter(family);
-  const capitalizedGroup = capitalizeFirstLetter(group);
-  const capitalizedSubgroup = capitalizeFirstLetter(subgroup);
-  
-  const response = await fetch(createUrl(`/${capitalizedFamily}/${capitalizedGroup}/${capitalizedSubgroup}/${number}`));
+export const getImageByFilePath = async (filePath: string) => {
+  const response = await fetch(createUrl(filePath));
   if (!response.ok) {
     const errorMessage = await response.text();
     throw new Error(`Failed to fetch the image. ${errorMessage}`);
   }
-  return response.json();
+  
+  // Всегда обрабатываем ответ как текст
+  return { file_path: await response.text() }; 
 };
+
 
 
 // 3. Поиск изображений по ключевому слову и семейству
