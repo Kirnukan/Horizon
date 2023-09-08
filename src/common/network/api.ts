@@ -50,7 +50,9 @@ export const getImagesByFamilyGroupAndSubgroup = async (family: string, group: s
 
 // 2. Получение изображения по семейству, группе и номеру
 export const getImageByFilePath = async (filePath: string) => {
+  
   const response = await fetch(createUrl(filePath));
+  console.log(filePath, '---', response)
   if (!response.ok) {
     const errorMessage = await response.text();
     throw new Error(`Failed to fetch the image. ${errorMessage}`);

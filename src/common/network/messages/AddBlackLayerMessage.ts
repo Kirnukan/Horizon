@@ -1,11 +1,10 @@
 import { NetworkSide } from "@common/network/sides";
 import * as Networker from "monorepo-networker";
 
-
 interface Payload {
-    svg: string;
+    svgStandard: string;
+    svgWide: string;
 }
-
 
 export class AddBlackLayerMessage extends Networker.MessageType<Payload> {
     public receivingSide(): Networker.Side {
@@ -14,46 +13,50 @@ export class AddBlackLayerMessage extends Networker.MessageType<Payload> {
 
     public handle(payload: Payload, from: Networker.Side): void {
         const nodes = figma.currentPage.selection;
-        let svgString = payload.svg
-    
 
-        for (const node of nodes) {
-            if ("children" in node && node.type === "FRAME") {
+        nodes.forEach(node => {
+            if (node.type === "FRAME") {
+                let svgToUse;
 
-                // Create SVG node from raw SVG string
-                const svgNode = figma.createNodeFromSvg(svgString);
-
-                // Get the original dimensions of the SVG
-                const originalWidth = svgNode.width;
-                const originalHeight = svgNode.height;
-                
-
-                // Determine the aspect ratio of the SVG
-                const aspectRatio = originalWidth / originalHeight;
-
-                // Determine the new dimensions based on the frame shape
-                let newWidth, newHeight;
                 if (node.width === node.height) {  // Square frame
-                    newWidth = newHeight = Math.min(node.width, node.height);
-                } else if (node.height > node.width) {  // Vertical frame
-                    newWidth = node.width;
-                    newHeight = newWidth / aspectRatio;
-                } else {  // Horizontal frame
-                    newHeight = node.height;
-                    newWidth = newHeight * aspectRatio;
+                    svgToUse = payload.svgStandard;
+                } else {  // Both Vertical and Horizontal frame use Wide
+                    svgToUse = payload.svgWide;
                 }
 
-                // Calculate the center position
-                const centerX = (node.width - newWidth) / 2;
-                const centerY = (node.height - newHeight) / 2;
+                const svgNode = figma.createNodeFromSvg(svgToUse);
 
-                svgNode.x = centerX;
-                svgNode.y = centerY;
-                svgNode.resize(newWidth, newHeight);
-                svgNode.fills = []; // Set to empty array for full transparency
+                if (node.height > node.width) {  // Vertical frame
+                    svgNode.rotation = -90;
+
+                    // Fit the SVG to the frame size
+                    svgNode.resize(node.height, node.width);
+
+                    // Centering the SVG node inside the frame
+                    svgNode.x = node.width;
+                    svgNode.y = 0;
+                    
+                } else {
+                    // Resize SVG to fit the frame for non-vertical frames
+                    const aspectRatioSvg = svgNode.width / svgNode.height;
+                    let newWidth, newHeight;
+                    if (node.width / node.height > aspectRatioSvg) {
+                        newWidth = node.width;
+                        newHeight = newWidth / aspectRatioSvg;
+                    } else {
+                        newHeight = node.height;
+                        newWidth = newHeight * aspectRatioSvg;
+                    }
+
+                    svgNode.resize(newWidth, newHeight);
+                    svgNode.x = (node.width - newWidth) / 2;
+                    svgNode.y = (node.height - newHeight) / 2;
+                }
+
+                // Add the node after positioning and resizing to make positioning relative to frame
                 node.appendChild(svgNode);
-
+                svgNode.fills = []; // Set to empty array for full transparency
             }
-        }
+        });
     }
 }

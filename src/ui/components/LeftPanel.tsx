@@ -113,22 +113,43 @@ import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure";
       }
     };
   
+    const convertToWidePath = (filePath: string): string => {
+      // Извлекаем часть пути после /static/images/
+      const subPath = filePath.split("/static/images/")[1];
+      // Извлекаем subgroup из subPath
+      const parts = subPath.split("/");
+      const subgroup = parts[2];
+      // Заменяем subgroup на subgroupWide
+      const newSubgroup = `${subgroup}Wide`;
+      
+      // Формируем новое имя файла
+      const fileName = parts[3];
+      const newFileName = fileName.replace(subgroup, newSubgroup);
+      
+      // Формируем новый путь к файлу
+      parts[2] = newSubgroup;
+      parts[3] = newFileName;
+  
+      return `/static/images/${parts.join("/")}`;
+  };
+  
   
   
 
-    const handleButtonClick = async (filePath: string) => {
-      console.log("Button clicked:", filePath);
-      try {
-          const svgString = await handleImageClick(filePath);
-          let updatedSVG = updateSVGColors(svgString);  // Получите обновленный SVG
-          
-          // Отправка обновленного SVG в Figma
-          NetworkMessages.ADD_BLACK_LAYER.send({ svg: updatedSVG });
-  
-      } catch (error) {
-          console.error('Ошибка при отправке SVG в Figma:', error);
-      }
-  };
+  const handleButtonClick = async (filePath: string) => {
+    console.log("Button clicked:", filePath);
+    try {
+        const standardSVGString = await handleImageClick(filePath);
+        const wideSVGPath = convertToWidePath(filePath);
+        const wideSVGString = await handleImageClick(wideSVGPath); 
+
+        // Отправка SVG в Figma. Мы передаем оба SVG: стандартный и широкий.
+        NetworkMessages.ADD_BLACK_LAYER.send({ svgStandard: standardSVGString, svgWide: wideSVGString });
+    } catch (error) {
+        console.error('Ошибка при отправке SVG в Figma:', error);
+    }
+};
+
   
 
   const updateSVGColors = (svgString: string): string => {
