@@ -225,6 +225,47 @@
         }
       }
       
+    .icon-buttons-container {
+        display: flex;
+        gap: 4px; // Отступ между кнопками
+    }
+    
+    .icon-button {
+        display: flex;
+        width: 32px;
+        height: 32px;
+        padding: 5px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        border-radius: 2px;
+        border: 1px solid #C3CCE5;
+        background: #FFF;
+        
+        &.disabled {
+            border: 1px solid #F7F7F7;
+            background: #FFF;
+            svg {
+                fill: #F2F2F2;
+            }
+        }
+    
+        svg {
+            width: 20px;
+            height: 21px;
+            flex-shrink: 0;
+            fill: #A3ADCC;
+        }
+    }
+    
+
+    .pallette-figma-buttons-container {
+      display: flex;
+      flex-direction: row;
+      gap: 4px;
+    }
+
           .dropdown-header {
             padding: 3px 6px;
             font-family: Stapel;

@@ -86,6 +86,40 @@ import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure";
 
 
   const LeftPanel: React.FC<LeftPanelProps> = ({ activeTab, onTabChange }) => {
+    const [isFrameSelected, setIsFrameSelected] = useState(false);
+    type SelectionChangeMessage = {
+      type: 'SELECTION_CHANGE';
+      data: {
+          hasSquareFrames: boolean;
+          hasHorizontalFrames: boolean;
+          hasVerticalFrames: boolean;
+          isAnyFrameSelected: boolean;
+      };
+    };
+    // Подписываемся на изменения выделения при монтировании компонента
+    useEffect(() => {
+
+    
+      const handleSelectionChange = (event: MessageEvent<any>) => {
+        const message = event.data.pluginMessage;  // <-- Change this line
+    
+        console.log('Full received message:', message);  // It should now print the correct structure
+    
+        if (message && message.type === 'SELECTION_CHANGE') {
+            setIsFrameSelected(message.data.isAnyFrameSelected);
+        }
+    };
+  
+      window.addEventListener("message", handleSelectionChange);
+  
+      return () => {
+          window.removeEventListener("message", handleSelectionChange);
+      };
+  }, []);
+  
+  
+
+
     const tabs = ["frames", "textures", "details", "effects"];
     const [colors, setColors] = useState(["#0A64AD", "#FFFFFF", "#059DF5"]);
     const [openDropdown, setOpenDropdown] = useState<Record<string, boolean>>({});
@@ -178,6 +212,63 @@ import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure";
       }));
     };
     
+  //   const handleHorizontalMirror = () => {
+  //     const nodes = figma.currentPage.selection;
+  
+  //     nodes.forEach(node => {
+  //         if (node.type === "FRAME" && node.width > node.height) { // Горизонтальный фрейм
+  //             const lastChild = node.children[node.children.length - 1];
+  //             if (lastChild && "rotation" in lastChild) {
+  //                 lastChild.rotation = (lastChild.rotation + 180) % 360;
+  //             }
+  //         }
+  //     });
+  // }
+  
+  // const handleVerticalMirror = () => {
+  //     const nodes = figma.currentPage.selection;
+  
+  //     nodes.forEach(node => {
+  //         if (node.type === "FRAME" && node.height > node.width) { // Вертикальный фрейм
+  //             const lastChild = node.children[node.children.length - 1];
+  //             if (lastChild && "rotation" in lastChild) {
+  //                 lastChild.rotation = (lastChild.rotation + 180) % 360;
+  //             }
+  //         }
+  //     });
+  // }
+  
+  // const handleRotate = () => {
+  //     const nodes = figma.currentPage.selection;
+  
+  //     nodes.forEach(node => {
+  //         if (node.type === "FRAME" && node.width === node.height) { // Квадратный фрейм
+  //             const lastChild = node.children[node.children.length - 1];
+  //             if (lastChild && "rotation" in lastChild) {
+  //                 lastChild.rotation = (lastChild.rotation + 90) % 360;
+  //             }
+  //         }
+  //     });
+  // }
+  
+
+    const handleHorizontalMirrorClick = () => {
+        NetworkMessages.HORIZONTAL_MIRROR.send({});
+        console.log('test handleHorizontalMirrorClick')
+    };
+
+    const handleVerticalMirrorClick = () => {
+        NetworkMessages.VERTICAL_MIRROR.send({});
+        console.log('test handleVerticalMirrorClick')
+    };
+
+
+    const handleRotateFrame = () => {
+        NetworkMessages.ROTATE_FRAME.send({});
+        console.log('test handleRotateFrame')
+    }
+    
+    
     const renderTabContent = (tabId: string) => {
       const tabData = tabsData.find(tab => tab.name.toLowerCase() === tabId);
       if (!tabData) return null;
@@ -185,6 +276,7 @@ import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure";
         <div className="tab-content">
           <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
           {tabId === 'frames' && (
+            <div className="pallette-figma-buttons-container">
                   <div className="pallete">
                     Colors
                     <div className="pallete-colors">
@@ -207,7 +299,40 @@ import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure";
                         onChange={(e) => setColor3(e.target.value)}
                       />
                     </div>
+                    
                   </div>
+
+                  <div className="icon-buttons-container">
+                    <button 
+                        id="horizontalMirrorBtn" 
+                        className={`icon-button ${!isFrameSelected ? 'disabled' : ''}`} 
+                        onClick={isFrameSelected ? handleHorizontalMirrorClick : undefined}
+                    >
+                        <svg width="20" height="21" fill="#F2F2F2">
+                            <path d="M5.93664 8.61269V6L0 10.4999L5.93664 15V12.4588H17.0634V14.9999L23 10.4999L17.0634 6V8.61269H5.93664Z"/>
+                        </svg>
+                    </button>
+                    <button 
+                        id="verticalMirrorBtn" 
+                        className={`icon-button ${!isFrameSelected ? 'disabled' : ''}`} 
+                        onClick={isFrameSelected ? handleVerticalMirrorClick : undefined}
+                    >
+                        <svg width="20" height="21" fill="#F2F2F2">
+                            <path d="M8.61269 17.0634L6 17.0634L10.4999 23L15 17.0634L12.4588 17.0634L12.4588 5.93665L14.9999 5.93665L10.4999 -1.96699e-07L6 5.93665L8.61269 5.93665L8.61269 17.0634Z"/>
+                        </svg>
+                    </button>
+                    <button 
+                        id="rotateFrameBtn" 
+                        className={`icon-button ${!isFrameSelected ? 'disabled' : ''}`} 
+                        onClick={isFrameSelected ? handleRotateFrame : undefined}
+                    >
+                        <svg width="20" height="21" fill="#F2F2F2">
+                            <path d="M10.5 21C15.7383 21 20 16.8025 20 11.6432C20 6.70994 16.1037 2.65673 11.1829 2.31071V0L5.21144 3.97984L11.1829 7.95976V5.71232C14.2046 6.04773 16.5611 8.57888 16.5611 11.6432C16.5611 14.9349 13.8421 17.6129 10.5001 17.6129C7.15808 17.6129 4.43904 14.9348 4.43904 11.6432C4.43904 10.3579 4.84703 9.13385 5.6188 8.10351L2.85148 6.09257C1.64027 7.70957 1 9.62889 1 11.6432C1 16.8025 5.26169 21 10.5 21Z"/>
+                        </svg>
+                    </button>
+                </div>  
+                </div>
+                  
                 )}
           {tabData.groups.map((group: Group) => (
             <SimpleDropdown key={group.title} title={group.title}>

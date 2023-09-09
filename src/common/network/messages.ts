@@ -7,6 +7,9 @@ import {AddBlackLayerMessage} from "@common/network/messages/AddBlackLayerMessag
 import {CleanFramesMessage} from "@common/network/messages/CleanFramesMessage";
 import { RequestFrameSizesMessage } from "@common/network/messages/RequestFrameSizesMessage";
 import { FrameSizesResponseMessage } from "@common/network/messages/FrameSizesResponseMessage";
+import { RotateFrameMessage } from "@common/network/messages/RotateFrameMessage";
+import { HorizontalMirrorMessage } from "@common/network/messages/HorizontalMirrorMessage";
+import { VerticalMirrorMessage } from "@common/network/messages/VerticalMirrorMessage";
 
 
 export namespace NetworkMessages {
@@ -35,8 +38,23 @@ export namespace NetworkMessages {
   export const REQUEST_FRAME_SIZES = registry.register(
     new RequestFrameSizesMessage("request-frame-sizes")
   );
+  
   export const FRAME_SIZES_RESPONSE = registry.register(
     new FrameSizesResponseMessage("frame-sizes-response")
   );
+
+  export const ROTATE_FRAME = registry.register(
+    new RotateFrameMessage("rotate-frame")
+  );
+
+  export const HORIZONTAL_MIRROR = registry.register(
+    new HorizontalMirrorMessage("horizontal-mirror")
+  );
+
+  export const VERTICAL_MIRROR = registry.register(
+      new VerticalMirrorMessage("vertical-mirror")
+  );
+
+
 
 }
