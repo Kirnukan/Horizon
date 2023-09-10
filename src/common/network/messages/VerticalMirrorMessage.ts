@@ -19,10 +19,17 @@ export class VerticalMirrorMessage extends Networker.MessageType<{}> {
                     if (roundedRotation === 0 || roundedRotation === 360) {
                         lastChild.x = 0;
                         lastChild.y = 0;
-                    } else if (roundedRotation === 180) {
-                        lastChild.y = +node.height;
+                    } else if (roundedRotation === -90 || roundedRotation === 270) {
                         lastChild.x = +node.width;
+                        lastChild.y = 0;
+                    } else if (roundedRotation === -180 || roundedRotation === 180) {
+                        lastChild.x = +node.width;
+                        lastChild.y = +node.height;
+                    } else if (roundedRotation === -270 || roundedRotation === 90) {
+                        lastChild.x = 0;
+                        lastChild.y = +node.height;
                     }
+                    
                 }
             }
         });

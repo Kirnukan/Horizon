@@ -214,46 +214,6 @@ import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure";
         [dropdownId]: true,
       }));
     };
-    
-  //   const handleHorizontalMirror = () => {
-  //     const nodes = figma.currentPage.selection;
-  
-  //     nodes.forEach(node => {
-  //         if (node.type === "FRAME" && node.width > node.height) { // Горизонтальный фрейм
-  //             const lastChild = node.children[node.children.length - 1];
-  //             if (lastChild && "rotation" in lastChild) {
-  //                 lastChild.rotation = (lastChild.rotation + 180) % 360;
-  //             }
-  //         }
-  //     });
-  // }
-  
-  // const handleVerticalMirror = () => {
-  //     const nodes = figma.currentPage.selection;
-  
-  //     nodes.forEach(node => {
-  //         if (node.type === "FRAME" && node.height > node.width) { // Вертикальный фрейм
-  //             const lastChild = node.children[node.children.length - 1];
-  //             if (lastChild && "rotation" in lastChild) {
-  //                 lastChild.rotation = (lastChild.rotation + 180) % 360;
-  //             }
-  //         }
-  //     });
-  // }
-  
-  // const handleRotate = () => {
-  //     const nodes = figma.currentPage.selection;
-  
-  //     nodes.forEach(node => {
-  //         if (node.type === "FRAME" && node.width === node.height) { // Квадратный фрейм
-  //             const lastChild = node.children[node.children.length - 1];
-  //             if (lastChild && "rotation" in lastChild) {
-  //                 lastChild.rotation = (lastChild.rotation + 90) % 360;
-  //             }
-  //         }
-  //     });
-  // }
-  
 
     const handleHorizontalMirrorClick = () => {
         NetworkMessages.HORIZONTAL_MIRROR.send({});

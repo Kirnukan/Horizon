@@ -33,7 +33,7 @@ const TypeDropdown: React.FC<TypeDropdownProps> = ({
 
   const [buttons, setButtons] = useState<{ thumb_path: string, file_path: string }[]>([]);
 
-const updateSVGColors = (svgString: string) => {
+  const updateSVGColors = (svgString: string): string => {
     return svgString
         .replace(/#FF5500/g, color1)
         .replace(/#FFFFFF/g, color2)
@@ -41,8 +41,7 @@ const updateSVGColors = (svgString: string) => {
         .replace(/#9A2500/g, color3);
 }
 
-
-  useEffect(() => {
+useEffect(() => {
     if (isOpen) {
         const fetchImages = async () => {
             try {
@@ -59,7 +58,7 @@ const updateSVGColors = (svgString: string) => {
 
         fetchImages();
     }
-  }, [isOpen, family, group, subgroup]);
+}, [isOpen, family, group, subgroup, color1, color2, color3]);
 
 
   const handleDropdownClick = () => {
