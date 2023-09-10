@@ -30,36 +30,52 @@ const TypeDropdown: React.FC<TypeDropdownProps> = ({
   color2,
   color3,
 }) => {
+  const [buttons, setButtons] = useState<ButtonData[]>([]);
 
-  const [buttons, setButtons] = useState<{ thumb_path: string, file_path: string }[]>([]);
 
-  const updateSVGColors = (svgString: string): string => {
+  interface ButtonData {
+    thumb_path: string;
+    file_path: string;
+    svgContent: string;
+  } 
+
+  const updateSVGColors = (svgString: string) => {
     return svgString
         .replace(/#FF5500/g, color1)
         .replace(/#FFFFFF/g, color2)
         .replace(/white/g, color2)
         .replace(/#9A2500/g, color3);
-}
+  }
 
-useEffect(() => {
+  useEffect(() => {
     if (isOpen) {
-        const fetchImages = async () => {
-            try {
-                const images = await getImagesByFamilyGroupAndSubgroup(family, group, subgroup);
-                const updatedImages = images.map(img => {
-                    const updatedSVG = updateSVGColors(img.file_path);
-                    return { thumb_path: img.thumb_path, file_path: updatedSVG };
-                });
-                setButtons(updatedImages);
-            } catch (error) {
-                console.error('Failed to load images:', error);
-            }
-        };
+    const fetchSVGContent = async (url: string): Promise<string> => {
+        const response = await fetch(url);
+        return response.text();
+    };
+
+    const fetchImages = async () => {
+        try {
+            const images = await getImagesByFamilyGroupAndSubgroup(family, group, subgroup);
+            console.log("Original SVGs:", images);
+
+            const updatedImagesPromises = images.map(async img => {
+                const svgContent = await fetchSVGContent(img.file_path);
+                const updatedSVG = updateSVGColors(svgContent);
+                return { thumb_path: img.thumb_path, file_path: img.file_path, svgContent: updatedSVG };
+
+            });
+
+            const updatedImages = await Promise.all(updatedImagesPromises);
+            setButtons(updatedImages);
+        } catch (error) {
+            console.error('Failed to load images:', error);
+        }
+    };
 
         fetchImages();
     }
-}, [isOpen, family, group, subgroup, color1, color2, color3]);
-
+  }, [isOpen, family, group, subgroup, color1, color2, color3]);
 
   const handleDropdownClick = () => {
     onOpen();
@@ -87,12 +103,13 @@ useEffect(() => {
               className="dropdown-button"
               style={{ backgroundImage: `url(${button.thumb_path})` }}
               onClick={(event) => {
-                event.stopPropagation();
-                onImageClick(button.file_path);
+                  event.stopPropagation();
+                  onImageClick(button.file_path);
               }}
-            >
-              {button.file_path.endsWith('.svg') && <img src={button.file_path} />}
-            </button>
+          >
+              <div className="dropdown-button" dangerouslySetInnerHTML={{ __html: button.svgContent }} />
+          </button>
+
           ))}
         </div>
       )}

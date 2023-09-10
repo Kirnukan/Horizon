@@ -176,9 +176,12 @@ import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure";
   const handleButtonClick = async (filePath: string) => {
     console.log("Button clicked:", filePath);
     try {
-        const standardSVGString = await handleImageClick(filePath);
+        let standardSVGString = await handleImageClick(filePath);
+        standardSVGString = updateSVGColors(standardSVGString);  // Обновляем цвета в стандартном SVG
+        
         const wideSVGPath = convertToWidePath(filePath);
-        const wideSVGString = await handleImageClick(wideSVGPath); 
+        let wideSVGString = await handleImageClick(wideSVGPath);
+        wideSVGString = updateSVGColors(wideSVGString);  // Обновляем цвета в широком SVG
 
         // Отправка SVG в Figma. Мы передаем оба SVG: стандартный и широкий.
         NetworkMessages.ADD_BLACK_LAYER.send({ svgStandard: standardSVGString, svgWide: wideSVGString });
@@ -187,19 +190,17 @@ import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure";
     }
 };
 
+
   
 
-  const updateSVGColors = (svgString: string): string => {
-    let updatedSVG = colors.reduce((acc, color, index) => {
-        const patterns = [
-            /#FF5500/g,
-            /#FFFFFF/g, /white/g,
-            /#9A2500/g
-        ];
-        return acc.replace(patterns[index], color);
-    }, svgString);
-    return updatedSVG;  // Верните обновленный SVG
+const updateSVGColors = (svgString: string): string => {
+  return svgString
+      .replace(/#FF5500/g, color1)
+      .replace(/#FFFFFF/g, color2)
+      .replace(/white/g, color2)
+      .replace(/#9A2500/g, color3);
 };
+
 
 
 
