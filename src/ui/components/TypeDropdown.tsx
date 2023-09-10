@@ -31,39 +31,43 @@ const TypeDropdown: React.FC<TypeDropdownProps> = ({
   color3,
 }) => {
   const [buttons, setButtons] = useState<ButtonData[]>([]);
+    const [isMousePressed, setIsMousePressed] = useState(false);
 
+    interface ButtonData {
+        thumb_path: string;
+        file_path: string;
+        svgContent: string;
+    }
 
-  interface ButtonData {
-    thumb_path: string;
-    file_path: string;
-    svgContent: string;
-  } 
-
-  const updateSVGColors = (svgString: string) => {
-    return svgString
-        .replace(/#FF5500/g, color1)
-        .replace(/#FFFFFF/g, color2)
-        .replace(/white/g, color2)
-        .replace(/#9A2500/g, color3);
-  }
-
-  useEffect(() => {
-    if (isOpen) {
-    const fetchSVGContent = async (url: string): Promise<string> => {
-        const response = await fetch(url);
-        return response.text();
+    const updateSVGColors = (svgString: string) => {
+        return svgString
+            .replace(/#FF5500/g, color1)
+            .replace(/#FFFFFF/g, color2)
+            .replace(/white/g, color2)
+            .replace(/#9A2500/g, color3);
     };
 
-    const fetchImages = async () => {
+    const handleMouseDown = () => {
+        setIsMousePressed(true);
+    };
+
+    const handleMouseUp = () => {
+        setIsMousePressed(false);
+        updatePreview();
+    };
+
+    const updatePreview = async () => {
+        const fetchSVGContent = async (url: string): Promise<string> => {
+            const response = await fetch(url);
+            return response.text();
+        };
+
         try {
             const images = await getImagesByFamilyGroupAndSubgroup(family, group, subgroup);
-            console.log("Original SVGs:", images);
-
             const updatedImagesPromises = images.map(async img => {
                 const svgContent = await fetchSVGContent(img.file_path);
                 const updatedSVG = updateSVGColors(svgContent);
                 return { thumb_path: img.thumb_path, file_path: img.file_path, svgContent: updatedSVG };
-
             });
 
             const updatedImages = await Promise.all(updatedImagesPromises);
@@ -73,13 +77,17 @@ const TypeDropdown: React.FC<TypeDropdownProps> = ({
         }
     };
 
-        fetchImages();
-    }
-  }, [isOpen, family, group, subgroup, color1, color2, color3]);
+    useEffect(() => {
+      if (isOpen) {
+        updatePreview();
+      }
+    }, [isOpen, family, group, subgroup]);
 
-  const handleDropdownClick = () => {
-    onOpen();
-  };
+    const handleDropdownClick = () => {
+        onOpen();
+    };
+  // Для удобства, я убрал обновление превью из зависимостей `useEffect`
+  // Теперь, превью будет обновляться только при открытии выпадающего списка
 
   return (
     <div className="type-dropdown-wrapper">
@@ -109,7 +117,6 @@ const TypeDropdown: React.FC<TypeDropdownProps> = ({
           >
               <div className="dropdown-button" dangerouslySetInnerHTML={{ __html: button.svgContent }} />
           </button>
-
           ))}
         </div>
       )}
