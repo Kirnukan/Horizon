@@ -10,10 +10,19 @@ export class HorizontalMirrorMessage extends Networker.MessageType<{}> {
         const nodes = figma.currentPage.selection;
 
         nodes.forEach(node => {
-            if (node.type === "FRAME" && node.width > node.height) {  // Горизонтальный фрейм
+            if (node.type === "FRAME" && node.width > node.height) {  
                 const lastChild = node.children[node.children.length - 1];
                 if (lastChild && "rotation" in lastChild) {
                     lastChild.rotation = (lastChild.rotation + 180) % 360;
+                    const roundedRotation = Math.round(lastChild.rotation);
+                    console.log(roundedRotation)
+                    if (roundedRotation === 0 || roundedRotation === 360) {
+                        lastChild.x = 0;
+                        lastChild.y = 0;
+                    } else if (roundedRotation === 180) {
+                        lastChild.y = +node.height;
+                        lastChild.x = +node.width;
+                    }
                 }
             }
         });

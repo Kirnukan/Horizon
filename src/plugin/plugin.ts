@@ -48,7 +48,7 @@ async function bootstrap() {
       console.log('Sending SELECTION_CHANGE message');  // <-- Add this line
       figma.ui.postMessage({
           type: 'SELECTION_CHANGE',
-          data: { hasSquareFrames, hasHorizontalFrames, hasVerticalFrames, isAnyFrameSelected  }
+          data: { hasSquareFrames, hasHorizontalFrames, hasVerticalFrames }
       });
 
 });
