@@ -14,6 +14,63 @@ import RightPanel from "@ui/components/RightPanel";
 
 function App() {
     const [activeTab, setActiveTab] = useState("frames");
+    const [images, setImages] = useState<Array<{ thumb_path: string, file_path: string } | null>>(Array(9).fill(null));
+    const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+
+    const handleImageClickForJPG = async (filePath: string): Promise<ArrayBuffer> => {
+        try {
+            const response = await fetch(filePath);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            const arrayBuffer = await response.arrayBuffer();
+    
+            return arrayBuffer;
+        } catch (error) {
+            console.error('Ошибка при обработке изображения:', error);
+            throw error; 
+        }
+      };
+
+    const handleImageClick = async (index: number) => {
+        console.log("Function handleImageClick called with index:", index);
+        const image = images[index];
+        if (!image) {
+            console.log("No image found at index", index);
+            return;
+        }
+        console.log("Image at index", index, ":", image);
+        if (image) {
+            try {
+                const arrayBuffer = await handleImageClickForJPG(image.file_path);
+                NetworkMessages.ADD_IMAGE_TO_FIGMA.send({ image: arrayBuffer });
+            } catch (error) {
+                console.error('Ошибка при добавлении изображения в Figma:', error);
+            }
+        }
+      };
+
+    const addToRightPanel = (button: { thumb_path: string, file_path: string }) => {
+        setImages(prevImages => {
+            const newImages = [...prevImages];
+            const index = newImages.findIndex(img => img === null);
+            if (index !== -1) {
+                newImages[index] = button;
+            } else {
+                newImages.shift();
+                newImages.push(button);
+            }
+            return newImages;
+        });
+    };
+    
+    
+    
+    
+    
+    
 
     // ... остальной код ...
 
@@ -26,8 +83,15 @@ function App() {
                 {/* ... остальной код ... */}
 
                 <div className="panels-container">
-                    <LeftPanel activeTab={activeTab} onTabChange={setActiveTab} />
-                    <RightPanel />
+                    <LeftPanel 
+                    activeTab={activeTab} 
+                    onTabChange={setActiveTab} 
+                    addToRightPanel={addToRightPanel} 
+                    images={images} 
+                    handleImageClick={handleImageClick}
+
+                    />
+                    <RightPanel images={images} setImages={setImages} handleImageClick={handleImageClick}/>
                 </div>
 
                 {/* ... остальной код ... */}

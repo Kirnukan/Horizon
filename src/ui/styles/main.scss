@@ -370,7 +370,7 @@
         display: flex; /* Сделать контейнер кнопки гибким для корректного выравнивания SVG */
         align-items: center; /* Центрировать SVG по вертикали */
         justify-content: center; /* Центрировать SVG по горизонтали */
-        padding: 0;
+        padding: 2px;
         border-width: 0;
         border-radius: 4px;
 
@@ -418,7 +418,22 @@
 
         .element {
           height: 44px;
-          
+    
+          button {
+            display: flex; // Сделать контейнер кнопки гибким
+            align-items: center; // Центрировать изображение по вертикали
+            justify-content: center; // Центрировать изображение по горизонтали
+            border: none; // Убрать рамку
+            outline: none; // Убрать контур фокуса
+            cursor: pointer; // Установить курсор в виде руки при наведении
+    
+            // Стили для фона (изображения)
+            background-size: contain;  // Изменено с 'cover' на 'contain'
+            background-repeat: no-repeat; // Предотвращаем повторение изображения
+            background-position: center; // Центрируем изображение
+            background-color: transparent; // Для прозрачности, если изображение не занимает всю кнопку
+            background-size: 40px 40px; 
+          }
         }
 
         .button {

@@ -10,6 +10,7 @@ import { FrameSizesResponseMessage } from "@common/network/messages/FrameSizesRe
 import { RotateFrameMessage } from "@common/network/messages/RotateFrameMessage";
 import { HorizontalMirrorMessage } from "@common/network/messages/HorizontalMirrorMessage";
 import { VerticalMirrorMessage } from "@common/network/messages/VerticalMirrorMessage";
+import { AddImageToFigmaMessage } from "./messages/AddImageToFigmaMessage";
 
 
 export namespace NetworkMessages {
@@ -29,6 +30,9 @@ export namespace NetworkMessages {
 
   export const ADD_BLACK_LAYER = registry.register(
       new AddBlackLayerMessage("add-black-layer")
+  )
+  export const ADD_IMAGE_TO_FIGMA = registry.register(
+    new AddImageToFigmaMessage("add-image-to-figma")
   )
 
   export const CLEAN_FRAMES = registry.register(

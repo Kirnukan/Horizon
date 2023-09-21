@@ -1,17 +1,65 @@
 import { NetworkMessages } from "@common/network/messages";
-import React from "react";
+import React, { useState } from "react";
 
-const RightPanel: React.FC = () => {
+type RightPanelProps = {
+    images: Array<{ thumb_path: string, file_path: string } | null>
+    handleImageClick: (index: number) => void;
+    setImages: React.Dispatch<React.SetStateAction<Array<{ thumb_path: string, file_path: string } | null>>>;
+};
+
+const RightPanel: React.FC<RightPanelProps> = (props) => {
+
+    // const [images, setImages] = useState<Array<{ thumb_path: string, file_path: string } | null>>(Array(9).fill(null));
+
 const handleCleanFramesClick = () => {
-    console.log('test')
+    console.log('clean')
     NetworkMessages.CLEAN_FRAMES.send({})
 };
+
+const addToRightPanel = (button: { thumb_path: string, file_path: string }) => {
+    props.setImages(prevImages => {
+      const newImages = [...prevImages];
+      const index = newImages.findIndex(img => img === null);
+      if (index !== -1) {
+        newImages[index] = button;
+      } else {
+        newImages.shift();  // Удалить первый элемент
+        newImages.push(button);  // Добавить новый элемент в конец
+      }
+      return newImages;
+    });
+  };
+
+
+
+
+  
+
+
+
+  const handleRightClick = (event: React.MouseEvent<HTMLButtonElement>, index: number) => {
+    event.preventDefault();
+    props.setImages(prevImages => {
+        const newImages = [...prevImages];
+        newImages[index] = null;
+        return newImages;
+    });
+};
+
+
+
 return (
     <div className="right-panel">
         <div className="elements">
-            {[...Array(9)].map((_, i) => (
-                <div key={i} className="element" />
-            ))}
+        {props.images.map((image, index) => (
+          <div key={index} className="element">
+            <button className="element"
+              onClick={() => props.handleImageClick(index)}
+              onContextMenu={(event) => handleRightClick(event, index)}
+              style={{ backgroundImage: image ? `url(${image.thumb_path})` : 'none' }}
+            />
+          </div>
+        ))}
             <div className="button" />
             <div className="button" />
             <div className="button big-button" onClick={handleCleanFramesClick}>

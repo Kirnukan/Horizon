@@ -28,11 +28,11 @@ export const tabsData: Tab[] = [
             imageActive: groupsUtil.imageActive1,
             imagePassive: groupsUtil.imagePassive1,
           },
-          {
-            title: "Abstract1",
-            imageActive: groupsUtil.imageActive2,
-            imagePassive: groupsUtil.imagePassive2,
-          },
+          // {
+          //   title: "Abstract1",
+          //   imageActive: groupsUtil.imageActive2,
+          //   imagePassive: groupsUtil.imagePassive2,
+          // },
           // {
           //   title: "Abstract3",
           //   imageActive: groupsUtil.imageActive3,
@@ -60,42 +60,10 @@ export const tabsData: Tab[] = [
             imageActive: groupsUtil.imageActive1,
             imagePassive: groupsUtil.imagePassive1,
           },
-          {
-            title: "Decor1",
-            imageActive: groupsUtil.imageActive2,
-            imagePassive: groupsUtil.imagePassive2,
-          },
           // {
-          //   title: "Abstract2",
+          //   title: "Decor1",
           //   imageActive: groupsUtil.imageActive2,
           //   imagePassive: groupsUtil.imagePassive2,
-          // },
-          // {
-          //   title: "Abstract3",
-          //   imageActive: groupsUtil.imageActive3,
-          //   imagePassive: groupsUtil.imagePassive3,
-          // },
-          // {
-          //   title: "Abstract4",
-          //   imageActive: groupsUtil.imageActive4,
-          //   imagePassive: groupsUtil.imagePassive4,
-          // },
-          // {
-          //   title: "Abstract5",
-          //   imageActive: groupsUtil.imageActive5,
-          //   imagePassive: groupsUtil.imagePassive5,
-          // },
-          
-          // ... другие подгруппы для Simple
-        ],
-      },
-      {
-        title: "Minimal",
-        subgroups: [
-          // {
-          //   title: "Abstract",
-          //   imageActive: groupsUtil.imageActive1,
-          //   imagePassive: groupsUtil.imagePassive1,
           // },
           // {
           //   title: "Abstract2",
@@ -121,6 +89,38 @@ export const tabsData: Tab[] = [
           // ... другие подгруппы для Simple
         ],
       },
+      // {
+      //   title: "Minimal",
+      //   subgroups: [
+      //     // {
+      //     //   title: "Abstract",
+      //     //   imageActive: groupsUtil.imageActive1,
+      //     //   imagePassive: groupsUtil.imagePassive1,
+      //     // },
+      //     // {
+      //     //   title: "Abstract2",
+      //     //   imageActive: groupsUtil.imageActive2,
+      //     //   imagePassive: groupsUtil.imagePassive2,
+      //     // },
+      //     // {
+      //     //   title: "Abstract3",
+      //     //   imageActive: groupsUtil.imageActive3,
+      //     //   imagePassive: groupsUtil.imagePassive3,
+      //     // },
+      //     // {
+      //     //   title: "Abstract4",
+      //     //   imageActive: groupsUtil.imageActive4,
+      //     //   imagePassive: groupsUtil.imagePassive4,
+      //     // },
+      //     // {
+      //     //   title: "Abstract5",
+      //     //   imageActive: groupsUtil.imageActive5,
+      //     //   imagePassive: groupsUtil.imagePassive5,
+      //     // },
+          
+      //     // ... другие подгруппы для Simple
+      //   ],
+      // },
       // ... другие группы для Frames
     ],
   },
@@ -130,7 +130,58 @@ export const tabsData: Tab[] = [
   },
   {
     name: "Details",
-    groups: [], // Здесь можно добавить группы для Details
+    groups: [
+      {
+        title: "Elements",
+        subgroups: [
+          {
+            title: "Diamonds",
+            imageActive: groupsUtil.imageActive1,
+            imagePassive: groupsUtil.imagePassive1
+          },
+          {
+            title: "Pedestal",
+            imageActive: groupsUtil.imageActive2,
+            imagePassive: groupsUtil.imagePassive2
+          },
+          {
+            title: "Water",
+            imageActive: groupsUtil.imageActive3,
+            imagePassive: groupsUtil.imagePassive3
+          },
+        ]
+      },
+      {
+        title: "Plants",
+        subgroups: [
+          {
+            title: "Flowers",
+            imageActive: groupsUtil.imageActive1,
+            imagePassive: groupsUtil.imagePassive1
+          },
+          {
+            title: "Green",
+            imageActive: groupsUtil.imageActive2,
+            imagePassive: groupsUtil.imagePassive2
+          },
+          {
+            title: "Pinkleaves",
+            imageActive: groupsUtil.imageActive3,
+            imagePassive: groupsUtil.imagePassive3
+          },
+        ]
+      },
+      {
+        title: "Shapes",
+        subgroups: [
+          {
+            title: "Glass",
+            imageActive: groupsUtil.imageActive1,
+            imagePassive: groupsUtil.imagePassive1
+          },
+        ]
+      },
+    ], // Здесь можно добавить группы для Details
   },
   {
     name: "Effects",

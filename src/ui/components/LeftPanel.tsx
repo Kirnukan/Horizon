@@ -6,6 +6,7 @@ import SimpleDropdown from "./Dropdown";
 import groupsUtil from "@ui/utils/groups.util";
 import { getImageByFilePath } from "@common/network/api";
 import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure"; 
+import DetailsDropdown from "./DetailsDropdown";
 
 
 
@@ -13,6 +14,7 @@ import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure";
     id: string;
     isActive: boolean;
     onClick: () => void;
+    retrieveImageByPath: (filePath: string) => Promise<string>;
   }
 
   const Tab: React.FC<TabProps> = ({ id, isActive, onClick }) => (
@@ -80,12 +82,15 @@ import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure";
   interface LeftPanelProps {
     activeTab: string;
     onTabChange: (tabId: string) => void;
+    addToRightPanel: (button: { thumb_path: string; file_path: string; }) => void;
+    images: Array<{ thumb_path: string, file_path: string } | null>;
+    handleImageClick: (index: number) => void;
   }
 
 
 
 
-  const LeftPanel: React.FC<LeftPanelProps> = ({ activeTab, onTabChange }) => {
+  const LeftPanel: React.FC<LeftPanelProps> = ({ activeTab, onTabChange, addToRightPanel, images, handleImageClick}) => {
     const [isSquareFrameSelected, setIsSquareFrameSelected] = useState(false);
     const [isHorizontalFrameSelected, setIsHorizontalFrameSelected] = useState(false);
     const [isVerticalFrameSelected, setIsVerticalFrameSelected] = useState(false);
@@ -131,8 +136,10 @@ import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure";
     const [color2, setColor2] = useState("#FFFFFF");
     const [color3, setColor3] = useState("#059DF5");
     const [currentSVG, setCurrentSVG] = useState<string | null>(null);
+    const [lastAddedImage, setLastAddedImage] = useState<{ thumb_path: string, file_path: string } | null>(null);
 
-    const handleImageClick = async (filePath: string): Promise<string> => {
+
+    const retrieveImageByPath = async (filePath: string): Promise<string> => {
       try {
           const response = await getImageByFilePath(filePath);
   
@@ -144,6 +151,23 @@ import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure";
           const svgString = response.file_path;
           console.log("SVG String:", svgString);
           return svgString;
+      } catch (error) {
+          console.error('Ошибка при обработке изображения:', error);
+          throw error; 
+      }
+    };
+  
+    const handleImageClickForJPG = async (filePath: string): Promise<ArrayBuffer> => {
+      try {
+          const response = await fetch(filePath);
+          
+          if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+  
+          const arrayBuffer = await response.arrayBuffer();
+  
+          return arrayBuffer;
       } catch (error) {
           console.error('Ошибка при обработке изображения:', error);
           throw error; 
@@ -173,22 +197,80 @@ import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure";
   
   
 
-  const handleButtonClick = async (filePath: string) => {
-    console.log("Button clicked:", filePath);
-    try {
-        let standardSVGString = await handleImageClick(filePath);
-        standardSVGString = updateSVGColors(standardSVGString);  // Обновляем цвета в стандартном SVG
+//   const handleButtonClick = async (filePath: string) => {
+//     console.log("Button clicked:", filePath);
+//     try {
+//         let standardSVGString = await handleImageClick(filePath);
+//         standardSVGString = updateSVGColors(standardSVGString);  // Обновляем цвета в стандартном SVG
         
-        const wideSVGPath = convertToWidePath(filePath);
-        let wideSVGString = await handleImageClick(wideSVGPath);
-        wideSVGString = updateSVGColors(wideSVGString);  // Обновляем цвета в широком SVG
+//         const wideSVGPath = convertToWidePath(filePath);
+//         let wideSVGString = await handleImageClick(wideSVGPath);
+//         wideSVGString = updateSVGColors(wideSVGString);  // Обновляем цвета в широком SVG
 
-        // Отправка SVG в Figma. Мы передаем оба SVG: стандартный и широкий.
-        NetworkMessages.ADD_BLACK_LAYER.send({ svgStandard: standardSVGString, svgWide: wideSVGString });
-    } catch (error) {
-        console.error('Ошибка при отправке SVG в Figma:', error);
-    }
+//         // Отправка SVG в Figma. Мы передаем оба SVG: стандартный и широкий.
+//         NetworkMessages.ADD_BLACK_LAYER.send({ svgStandard: standardSVGString, svgWide: wideSVGString });
+//     } catch (error) {
+//         console.error('Ошибка при отправке SVG в Figma:', error);
+//     }
+// };
+
+
+const handleFrameButtonClick = async (filePath: string) => {
+  console.log("Button clicked:", filePath);
+  try {
+      let standardSVGString = await retrieveImageByPath(filePath);
+      standardSVGString = updateSVGColors(standardSVGString);  // Обновляем цвета в стандартном SVG
+      
+      const wideSVGPath = convertToWidePath(filePath);
+      let wideSVGString = await retrieveImageByPath(wideSVGPath);
+      wideSVGString = updateSVGColors(wideSVGString);  // Обновляем цвета в широком SVG
+
+      // Отправка SVG в Figma. Мы передаем оба SVG: стандартный и широкий.
+      NetworkMessages.ADD_BLACK_LAYER.send({ svgStandard: standardSVGString, svgWide: wideSVGString });
+  } catch (error) {
+      console.error('Ошибка при отправке SVG в Figma:', error);
+  }
 };
+
+
+
+const handleDetailButtonClick = (filePath: string) => {
+  console.log("Button clicked:", filePath);
+  
+  // Создаем объект изображения
+  const newImage = {thumb_path: filePath, file_path: filePath};
+  
+  // Добавляем изображение в состояние
+  addToRightPanel(newImage);
+
+  // Получаем индекс только что добавленного изображения
+  const addedImageIndex = images.findIndex(img => img && img.thumb_path === newImage.thumb_path && img.file_path === newImage.file_path);
+  
+  // Если индекс найден, вызываем handleImageClick
+  if (addedImageIndex !== -1) {
+    // handleImageClick(addedImageIndex);
+  }
+};
+
+useEffect(() => {
+  const sendImageToFigma = async (image: { thumb_path: string, file_path: string }) => {
+    try {
+      // const arrayBuffer = await handleImageClickForJPG(image.file_path);
+      // NetworkMessages.ADD_IMAGE_TO_FIGMA.send({ image: arrayBuffer });
+    } catch (error) {
+      console.error('Ошибка при добавлении изображения в Figma:', error);
+    }
+  };
+
+  // Проверяем, есть ли новое изображение, которое еще не было отправлено в Figma
+  if (lastAddedImage) {
+    sendImageToFigma(lastAddedImage);
+  }
+}, [images, lastAddedImage]);
+
+
+
+
 
 
   
@@ -236,11 +318,8 @@ const updateSVGColors = (svgString: string): string => {
     const renderTabContent = (tabId: string) => {
       const tabData = tabsData.find(tab => tab.name.toLowerCase() === tabId);
       if (!tabData) return null;
-      return (
-        <div className="tab-content">
-          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-          {tabId === 'frames' && (
-            <div className="pallette-figma-buttons-container">
+    const renderFramesContent = () => (
+              <div className="pallette-figma-buttons-container">
                   <div className="pallete">
                     Colors
                     <div className="pallete-colors">
@@ -294,14 +373,40 @@ const updateSVGColors = (svgString: string): string => {
                             <path d="M10.5 21C15.7383 21 20 16.8025 20 11.6432C20 6.70994 16.1037 2.65673 11.1829 2.31071V0L5.21144 3.97984L11.1829 7.95976V5.71232C14.2046 6.04773 16.5611 8.57888 16.5611 11.6432C16.5611 14.9349 13.8421 17.6129 10.5001 17.6129C7.15808 17.6129 4.43904 14.9348 4.43904 11.6432C4.43904 10.3579 4.84703 9.13385 5.6188 8.10351L2.85148 6.09257C1.64027 7.70957 1 9.62889 1 11.6432C1 16.8025 5.26169 21 10.5 21Z"/>
                         </svg>
                     </button>
-                </div>  
+                  </div>  
                 </div>
-                  
-                )}
-          {tabData.groups.map((group: Group) => (
-            <SimpleDropdown key={group.title} title={group.title}>
-              <div className="type-dropdown-container">
-                {group.subgroups.map((subgroup: Subgroup) => (
+    );
+
+    const renderDetailsContent = () => (
+        <div>
+            {/* TODO: Добавьте ваш контент для вкладки "Details" */}
+        </div>
+    );
+
+    const renderTexturesContent = () => (
+        <div>
+            {/* TODO: Добавьте ваш контент для вкладки "Textures" */}
+        </div>
+    );
+
+    const renderEffectsContent = () => (
+        <div>
+            {/* TODO: Добавьте ваш контент для вкладки "Effects" */}
+        </div>
+    );
+    return (
+      <div className="tab-content">
+        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        {tabId === 'frames' && renderFramesContent()}
+        {tabId === 'details' && renderDetailsContent()}
+        {tabId === 'textures' && renderTexturesContent()}
+        {tabId === 'effects' && renderEffectsContent()}
+        
+        {tabData.groups.map((group: Group) => (
+          <SimpleDropdown key={group.title} title={group.title}>
+            <div className="type-dropdown-container">
+              {group.subgroups.map((subgroup: Subgroup) => (
+                tabId === 'frames' ? 
                   <TypeDropdown 
                     key={subgroup.title}
                     title={subgroup.title}
@@ -312,17 +417,30 @@ const updateSVGColors = (svgString: string): string => {
                     family={tabId}
                     group={group.title}
                     subgroup={subgroup.title}
-                    onImageClick={handleButtonClick}
+                    onImageClick={handleFrameButtonClick}
                     color1={color1}
                     color2={color2}
                     color3={color3}
                   />
-                ))}
-              </div>
-            </SimpleDropdown>
-          ))}
-        </div>
-      );
+                :
+                  <DetailsDropdown 
+                    key={subgroup.title}
+                    title={subgroup.title}
+                    imageActive={subgroup.imageActive}
+                    imagePassive={subgroup.imagePassive}
+                    isOpen={openDropdown[subgroup.title] || false}
+                    onOpen={() => handleOpenDropdown(subgroup.title)}
+                    family={tabId}
+                    group={group.title}
+                    subgroup={subgroup.title}
+                    onImageClick={handleDetailButtonClick}
+                  />
+              ))}
+            </div>
+          </SimpleDropdown>
+        ))}
+      </div>
+    );
     };
   
     return (
@@ -334,6 +452,7 @@ const updateSVGColors = (svgString: string): string => {
               id={tab}
               isActive={activeTab === tab}
               onClick={() => onTabChange(tab)}
+              retrieveImageByPath={retrieveImageByPath}
             />
           ))}
         </div>
