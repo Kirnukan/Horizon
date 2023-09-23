@@ -454,6 +454,110 @@
       
       }
     }
+    .color-container {
+      display: flex;
+      width: 314px;
+      align-items: center;
+      gap: 4px;
+      padding-bottom: 10px;
+    }
+    
+    .color-button {
+      position: relative;
+      height: 47px;
+      flex: 1 0 0;
+      border-radius: 6px;
+      box-sizing: border-box;
+      border: 1px solid var(--i, #E6E6E6);
+      transition: border 0.1s;
+    
+      &::before {
+        content: '';
+        position: absolute;
+        top: -1px;
+        right: -1px;
+        bottom: -1px;
+        left: -1px;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        transition: border 0.1s;
+      }
+    }
+    
+    .color-button.active {
+      border: 1px solid transparent;
+    
+      &::before {
+        border: 2px solid var(--i, #66B2FF);
+      }
+    }
+    
+    
+        
+    
+    .opacity-slider-container {
+      display: flex;
+      
+      height: 24px;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      position: relative;
+      color: #737C99; // Установка currentColor
+    
+      
+
+      .opacity-label,
+      .opacity-value {
+        font-family: Stapel;
+        font-size: 10px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+      }
+      .opacity-label, .opacity-value {
+        user-select: none;
+        pointer-events: none;
+      }
+      .opacity-label {
+        color: #FFF;
+        z-index: 1;
+        padding-left: 7px;
+      }
+    
+      .opacity-value {
+        color: #000;
+        z-index: 1;
+        padding-right: 7px;
+      }
+    
+      .opacity-slider {
+        appearance: none;
+        width: 100%; // Указание 100% ширины
+        height: 100%;
+        background: currentColor linear-gradient(90deg, #737C99 var(--slider-value, 50%), #fff var(--slider-value, 50%));
+        outline: none;
+        border: 1px solid #E6E6E6;
+        border-radius: 4px;
+        position: absolute; // Ползунок позиционируется поверх текста
+        top: 0;
+        left: 0;
+    
+        &::-webkit-slider-thumb {
+          appearance: none;
+          width: 0;
+          height: 0;
+        }
+    
+        &::-moz-range-thumb {
+          appearance: none;
+          width: 0;
+          height: 0;
+        }
+      }
+    }
+  
+    
 /* Стили для полосы прокрутки */
 .left-panel::-webkit-scrollbar {
   width: 4px; /* Ширина полосы */

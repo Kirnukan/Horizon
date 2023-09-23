@@ -126,7 +126,38 @@ export const tabsData: Tab[] = [
   },
   {
     name: "Textures",
-    groups: [], // Здесь можно добавить группы для Textures
+    groups: [
+      {
+        title: "Big",
+        subgroups: [
+          {
+            title: "Color",
+            imageActive: groupsUtil.imageActive1,
+            imagePassive: groupsUtil.imagePassive1,
+          }
+        ]
+      },
+      {
+        title: "Medium",
+        subgroups: [
+          {
+            title: "Color",
+            imageActive: groupsUtil.imageActive2,
+            imagePassive: groupsUtil.imagePassive2,
+          }
+        ]
+      },
+      {
+        title: "Small",
+        subgroups: [
+          {
+            title: "Color",
+            imageActive: groupsUtil.imageActive3,
+            imagePassive: groupsUtil.imagePassive3,
+          }
+        ]
+      }
+    ], // Здесь можно добавить группы для Textures
   },
   {
     name: "Details",

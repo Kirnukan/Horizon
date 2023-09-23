@@ -137,6 +137,9 @@ import DetailsDropdown from "./DetailsDropdown";
     const [color3, setColor3] = useState("#059DF5");
     const [currentSVG, setCurrentSVG] = useState<string | null>(null);
     const [lastAddedImage, setLastAddedImage] = useState<{ thumb_path: string, file_path: string } | null>(null);
+    const [opacity, setOpacity] = useState(50);
+    const [activeButton, setActiveButton] = useState<number | null>(null);
+
 
 
     const retrieveImageByPath = async (filePath: string): Promise<string> => {
@@ -313,6 +316,10 @@ const updateSVGColors = (svgString: string): string => {
         NetworkMessages.ROTATE_FRAME.send({});
         console.log('test handleRotateFrame')
     }
+
+    const handleButtonClick = (index: number) => {
+      setActiveButton(index);
+    }
     
     
     const renderTabContent = (tabId: string) => {
@@ -383,11 +390,49 @@ const updateSVGColors = (svgString: string): string => {
         </div>
     );
 
-    const renderTexturesContent = () => (
-        <div>
-            {/* TODO: Добавьте ваш контент для вкладки "Textures" */}
+const renderTexturesContent = () => (
+    <div>
+        {/* Ячейки цветов */}
+        <div className="color-container">
+          <div 
+            className={`color-button ${activeButton === 0 ? 'active' : ''}`} 
+            style={{ backgroundColor: color1 }}
+            onClick={() => handleButtonClick(0)}
+          ></div>
+
+          <div 
+            className={`color-button ${activeButton === 1 ? 'active' : ''}`} 
+            style={{ backgroundColor: color2 }}
+            onClick={() => handleButtonClick(1)}
+          ></div>
+
+          <div 
+            className={`color-button ${activeButton === 2 ? 'active' : ''}`} 
+            style={{ backgroundColor: color3 }}
+            onClick={() => handleButtonClick(2)}
+          ></div>
         </div>
-    );
+
+
+        {/* Ползунок прозрачности */}
+        <div className="opacity-slider-container">
+            <input
+                className="opacity-slider"
+                type="range"
+                min="0"
+                max="100"
+                value={opacity}
+                onChange={(e) => setOpacity(Number(e.target.value))}
+                style={{ "--slider-value": `${opacity}%` } as React.CSSProperties}
+            />
+            <span className="opacity-label">Opacity</span>
+            <span className="opacity-value">{opacity}%</span>
+        </div>
+
+        {/* Ваш код для остального содержимого */}
+    </div>
+);
+  
 
     const renderEffectsContent = () => (
         <div>
