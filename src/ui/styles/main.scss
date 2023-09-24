@@ -392,6 +392,11 @@
       
       
     }
+    .dropdown-button.active {
+      border: 2px solid #66B2FF;
+    }
+    
+        
 
     .right-panel {
       // Стили для .right-panel здесь
@@ -492,8 +497,7 @@
       }
     }
     
-    
-        
+
     
     .opacity-slider-container {
       display: flex;

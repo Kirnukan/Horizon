@@ -7,6 +7,7 @@ import groupsUtil from "@ui/utils/groups.util";
 import { getImageByFilePath } from "@common/network/api";
 import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure"; 
 import DetailsDropdown from "./DetailsDropdown";
+import TexturesDropdown from "./TexturesDropdown";
 
 
 
@@ -139,7 +140,10 @@ import DetailsDropdown from "./DetailsDropdown";
     const [lastAddedImage, setLastAddedImage] = useState<{ thumb_path: string, file_path: string } | null>(null);
     const [opacity, setOpacity] = useState(50);
     const [activeButton, setActiveButton] = useState<number | null>(null);
-
+    const [selectedTextures, setSelectedTextures] = useState<Record<string, string | null>>(
+      colors.reduce((acc, color) => ({ ...acc, [color]: null }), {})
+    );
+    
 
 
     const retrieveImageByPath = async (filePath: string): Promise<string> => {
@@ -432,7 +436,20 @@ const renderTexturesContent = () => (
         {/* Ваш код для остального содержимого */}
     </div>
 );
-  
+
+const handleTextureButtonClick = (texturePath: string, color: string) => {
+  console.log("Texture button clicked:", texturePath, color);
+  setSelectedTextures(prev => {
+    if (prev[color] === texturePath) {
+      return { ...prev, [color]: null };
+    } else {
+      return { ...prev, [color]: texturePath };
+    }
+  });
+};
+
+
+
 
     const renderEffectsContent = () => (
         <div>
@@ -451,7 +468,7 @@ const renderTexturesContent = () => (
           <SimpleDropdown key={group.title} title={group.title}>
             <div className="type-dropdown-container">
               {group.subgroups.map((subgroup: Subgroup) => (
-                tabId === 'frames' ? 
+                tabId === 'frames' ? (
                   <TypeDropdown 
                     key={subgroup.title}
                     title={subgroup.title}
@@ -467,7 +484,7 @@ const renderTexturesContent = () => (
                     color2={color2}
                     color3={color3}
                   />
-                :
+              ) : tabId === 'details' ? (
                   <DetailsDropdown 
                     key={subgroup.title}
                     title={subgroup.title}
@@ -480,6 +497,26 @@ const renderTexturesContent = () => (
                     subgroup={subgroup.title}
                     onImageClick={handleDetailButtonClick}
                   />
+              ) : tabId === 'textures' ? (
+                  <TexturesDropdown 
+                      key={subgroup.title}
+                      title={subgroup.title}
+                      imageActive={subgroup.imageActive}
+                      imagePassive={subgroup.imagePassive}
+                      isOpen={openDropdown[subgroup.title] || false}
+                      onOpen={() => handleOpenDropdown(subgroup.title)}
+                      family={tabId}
+                      group={group.title}
+                      subgroup={subgroup.title}
+                      selectedColor={
+                        activeButton === 0 ? color1 :
+                        activeButton === 1 ? color2 :
+                        color3
+                      }
+                      selectedTexture={selectedTextures[activeButton === 0 ? color1 : activeButton === 1 ? color2 : color3]}
+                      onTextureClick={handleTextureButtonClick}
+                  />
+              ) : null
               ))}
             </div>
           </SimpleDropdown>
