@@ -20,13 +20,13 @@ function App() {
     const handleImageClickForJPG = async (filePath: string): Promise<ArrayBuffer> => {
         try {
             const response = await fetch(filePath);
-            
+            console.log('Response - ',response)
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
     
             const arrayBuffer = await response.arrayBuffer();
-    
+            console.log(arrayBuffer)
             return arrayBuffer;
         } catch (error) {
             console.error('Ошибка при обработке изображения:', error);

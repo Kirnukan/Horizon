@@ -167,13 +167,13 @@ import TexturesDropdown from "./TexturesDropdown";
     const handleImageClickForJPG = async (filePath: string): Promise<ArrayBuffer> => {
       try {
           const response = await fetch(filePath);
-          
+          console.log('Response - ',response)
           if (!response.ok) {
               throw new Error(`HTTP error! Status: ${response.status}`);
           }
   
           const arrayBuffer = await response.arrayBuffer();
-  
+          console.log(arrayBuffer)
           return arrayBuffer;
       } catch (error) {
           console.error('Ошибка при обработке изображения:', error);
@@ -437,16 +437,54 @@ const renderTexturesContent = () => (
     </div>
 );
 
-const handleTextureButtonClick = (texturePath: string, color: string) => {
-  console.log("Texture button clicked:", texturePath, color);
-  setSelectedTextures(prev => {
-    if (prev[color] === texturePath) {
-      return { ...prev, [color]: null };
-    } else {
-      return { ...prev, [color]: texturePath };
-    }
-  });
+const determineSubgroupForColor = (color: string): string => {
+  switch (color.toLowerCase()) {
+    case '#ffffff':
+      return "White";
+    case '#000000':
+      return "Black";
+    default:
+      return "Color";
+  }
 };
+
+const replaceSubgroupInPath = (path: string, color: string): string => {
+  const subgroup = determineSubgroupForColor(color);
+  return path.replace("/Color/", `/${subgroup}/`).replace("_Color_", `_${subgroup}_`);
+};
+
+const handleTextureButtonClick = async (texturePath: string, color: string) => {
+  if (activeButton === null) {
+    console.log("Please select a color first!");
+    return;
+  }
+  console.log("Texture button clicked:", texturePath, color);
+
+  // Определение подгруппы на основе цвета
+  // const subgroup = determineSubgroupForColor(color);
+
+  // Меняем подгруппу в пути файла и в его названии
+  const newTexturePath = replaceSubgroupInPath(texturePath, color);
+
+  try {
+    const arrayBuffer = await handleImageClickForJPG(newTexturePath);
+    // Здесь вы можете передать arrayBuffer в Figma, как вы делали раньше
+    NetworkMessages.ADD_IMAGE_TO_FIGMA.send({ image: arrayBuffer });
+
+    // Обновление состояния, если это необходимо
+    setSelectedTextures(prev => {
+      if (prev[color] === newTexturePath) {
+        return { ...prev, [color]: null };
+      } else {
+        return { ...prev, [color]: newTexturePath };
+      }
+    });
+  } catch (error) {
+    console.error('Ошибка при добавлении текстуры в Figma:', error);
+  }
+};
+
+
 
 
 
