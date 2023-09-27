@@ -11,6 +11,7 @@ import { RotateFrameMessage } from "@common/network/messages/RotateFrameMessage"
 import { HorizontalMirrorMessage } from "@common/network/messages/HorizontalMirrorMessage";
 import { VerticalMirrorMessage } from "@common/network/messages/VerticalMirrorMessage";
 import { AddImageToFigmaMessage } from "./messages/AddImageToFigmaMessage";
+import { AddTextureToFigmaMessage } from "./messages/AddTextureToFigmaMessage";
 
 
 export namespace NetworkMessages {
@@ -34,7 +35,9 @@ export namespace NetworkMessages {
   export const ADD_IMAGE_TO_FIGMA = registry.register(
     new AddImageToFigmaMessage("add-image-to-figma")
   )
-
+  export const ADD_TEXTURE_TO_FIGMA = registry.register(
+    new AddTextureToFigmaMessage("add-texture-to-figma")
+  )
   export const CLEAN_FRAMES = registry.register(
     new CleanFramesMessage("clean-frames")
   )

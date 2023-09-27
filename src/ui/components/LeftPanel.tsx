@@ -469,7 +469,7 @@ const handleTextureButtonClick = async (texturePath: string, color: string) => {
   try {
     const arrayBuffer = await handleImageClickForJPG(newTexturePath);
     // Здесь вы можете передать arrayBuffer в Figma, как вы делали раньше
-    NetworkMessages.ADD_IMAGE_TO_FIGMA.send({ image: arrayBuffer });
+    NetworkMessages.ADD_TEXTURE_TO_FIGMA.send({ image: arrayBuffer, color });
 
     // Обновление состояния, если это необходимо
     setSelectedTextures(prev => {
