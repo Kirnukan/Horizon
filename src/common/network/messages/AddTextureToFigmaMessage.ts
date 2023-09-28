@@ -163,15 +163,24 @@ function reorderChildrenByMaskAndVector(parent: GroupNode | FrameNode): void {
         const bNumber = extractNumberFromName(b.name);
 
         if (a.name.includes("Mask group") && b.name.includes("Mask group")) {
-            return aNumber - bNumber; // Сортируем маски в порядке возрастания
+            return aNumber - bNumber;
         }
         
         if (a.name.includes("Vector") && b.name.includes("Vector")) {
-            return aNumber - bNumber; // Сортируем векторы в порядке возрастания
+            return aNumber - bNumber;
         }
 
-        if (a.name.includes("Mask group")) return -1; // Mask groups должны быть выше
-        if (b.name.includes("Mask group")) return 1; // Mask groups должны быть выше
+        if (a.name.includes("Mask group") && b.name.includes("Vector")) {
+            if (aNumber < bNumber) return -1;
+            if (aNumber > bNumber) return 1;
+            return 0;
+        }
+        
+        if (a.name.includes("Vector") && b.name.includes("Mask group")) {
+            if (aNumber < bNumber) return -1;
+            if (aNumber > bNumber) return 1;
+            return 0;
+        }
 
         return 0; // Для всех остальных случаев
     });
@@ -198,6 +207,7 @@ function reorderChildrenByMaskAndVector(parent: GroupNode | FrameNode): void {
         }
     });
 }
+
 
 
 
@@ -298,6 +308,18 @@ function renumberChildren(parent: GroupNode | FrameNode): void {
             }
         }
     });
+}
+
+function masksExistForColor(parent: GroupNode | FrameNode, color: string): boolean {
+    return parent.children.some(child => 
+        child.type === "GROUP" && 
+        child.name.startsWith("Mask group") && 
+        (child as GroupNode).children.some(n => 
+            n.type === "VECTOR" && 
+            n.name.startsWith("Original") && 
+            isMatchingColor(n, color)
+        )
+    );
 }
 
 
