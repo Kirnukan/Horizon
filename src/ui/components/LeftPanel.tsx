@@ -321,10 +321,16 @@ const updateSVGColors = (svgString: string): string => {
         console.log('test handleRotateFrame')
     }
 
+
     const handleButtonClick = (index: number) => {
       setActiveButton(index);
     }
     
+    const handleOpacityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newOpacity = Number(e.target.value);
+      setOpacity(newOpacity);
+      parent.postMessage({pluginMessage: {type: 'change-opacity', opacity: newOpacity}}, '*');
+    };
     
     const renderTabContent = (tabId: string) => {
       const tabData = tabsData.find(tab => tab.name.toLowerCase() === tabId);
@@ -426,7 +432,7 @@ const renderTexturesContent = () => (
                 min="0"
                 max="100"
                 value={opacity}
-                onChange={(e) => setOpacity(Number(e.target.value))}
+                onChange={handleOpacityChange}
                 style={{ "--slider-value": `${opacity}%` } as React.CSSProperties}
             />
             <span className="opacity-label">Opacity</span>
@@ -469,7 +475,7 @@ const handleTextureButtonClick = async (texturePath: string, color: string) => {
   try {
     const arrayBuffer = await handleImageClickForJPG(newTexturePath);
     // Здесь вы можете передать arrayBuffer в Figma, как вы делали раньше
-    NetworkMessages.ADD_TEXTURE_TO_FIGMA.send({ image: arrayBuffer, color });
+    NetworkMessages.ADD_TEXTURE_TO_FIGMA.send({ image: arrayBuffer, color, opacity });
 
     // Обновление состояния, если это необходимо
     setSelectedTextures(prev => {

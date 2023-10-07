@@ -4,6 +4,7 @@ import * as Networker from "monorepo-networker";
 interface Payload {
     image: ArrayBuffer;
     color: string;
+    opacity: number;
 }
 
 export class AddTextureToFigmaMessage extends Networker.MessageType<Payload> {
@@ -52,7 +53,8 @@ export class AddTextureToFigmaMessage extends Networker.MessageType<Payload> {
 
             const firstVector = vectorsGroup.children[0] as VectorNode;
             const textureSize = Math.max(firstVector.width, firstVector.height);
-            const rectangle = createTextureRectangle(textureSize, imageHash, color);
+            const opacity = payload.opacity / 100;
+            const rectangle = createTextureRectangle(textureSize, imageHash, color, opacity);
 
             vectorsGroup.children.forEach((vectorNode, idx) => {
                 if (vectorNode.type === "VECTOR" && isMatchingColor(vectorNode, color)) {
@@ -241,32 +243,6 @@ function reorderChildrenByMaskAndVector(parent: GroupNode | FrameNode): void {
 }
 
 
-
-
-
-
-
-
-function ensureMaskOrder(parent: GroupNode | FrameNode): void {
-    const maskGroups: GroupNode[] = [];
-
-    parent.children.forEach(child => {
-        if (child.type === "GROUP" && child.name.startsWith('Mask group')) {
-            maskGroups.push(child as GroupNode);
-        }
-    });
-
-    // Сортируем в прямом порядке
-    maskGroups.sort((a, b) => parseInt(a.name.split(' ')[2]) - parseInt(b.name.split(' ')[2]));
-
-    maskGroups.forEach((group, idx) => {
-        parent.insertChild(parent.children.length - 1 - idx, group);
-    });
-}
-
-
-
-
 function extractNumberFromName(name: string): number {
     return parseInt(name.match(/(\d+)/)?.[0] || "0", 10);
 }
@@ -342,22 +318,9 @@ function renumberChildren(parent: GroupNode | FrameNode): void {
     });
 }
 
-function masksExistForColor(parent: GroupNode | FrameNode, color: string): boolean {
-    return parent.children.some(child => 
-        child.type === "GROUP" && 
-        child.name.startsWith("Mask group") && 
-        (child as GroupNode).children.some(n => 
-            n.type === "VECTOR" && 
-            n.name.startsWith("Original") && 
-            isMatchingColor(n, color)
-        )
-    );
-}
 
 
-
-
-function createTextureRectangle(size: number, imageHash: string, color: string): RectangleNode {
+function createTextureRectangle(size: number, imageHash: string, color: string, opacity: number): RectangleNode {
     const rect = figma.createRectangle();
     rect.resize(size, size);
     rect.fills = [{
@@ -370,5 +333,6 @@ function createTextureRectangle(size: number, imageHash: string, color: string):
         type: "SOLID",
         color: hexToRgb(color)
     }];
+    rect.opacity = opacity;
     return rect;
 }
