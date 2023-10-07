@@ -79,6 +79,16 @@ export class AddTextureToFigmaMessage extends Networker.MessageType<Payload> {
                     }
                 }
             });
+
+            // if (node.type === "FRAME" && node.height > node.width) { 
+            //     const lastChild = node.children[node.children.length - 1];
+            //     if (lastChild && "rotation" in lastChild) {
+            //         lastChild.rotation = -90;
+            //         lastChild.y = 0;
+            //         lastChild.x = lastChild.width;
+            //         // const roundedRotation = Math.round(lastChild.rotation);
+            //     }
+            // }
         });
     }
 }
@@ -139,9 +149,31 @@ function createMaskGroup(vectorNode: VectorNode, rectangle: RectangleNode, group
         maskGroup.y = 0;
         maskVector.x = originalPosition.x;
         maskVector.y = originalPosition.y;
+        console.log("vectorNode.parent.height", maskVector.height)
+        console.log("vectorNode.parent.width", maskVector.width)
+
         vectorNode.x = originalPosition.x;
         vectorNode.y = originalPosition.y;
 
+        console.log(`Creating mask group ${maskName}...`);
+        maskGroup.children.forEach((vec, idx) => {
+            if (vec.type === "VECTOR" && vec.parent?.type === "GROUP") {
+                console.log(`Modifying vector at index ${idx}:`);
+                console.log(`- Initial: x=${vec.x}, y=${vec.y}, rotation=${vec.rotation}`);
+                
+                // Если маска вертикальная, применяем трансформации
+                if (vec.parent.parent?.parent?.parent?.parent?.type === 'FRAME' && 
+                vec.parent.parent.parent.parent.parent.height > vec.parent.parent.parent.parent.parent.width) { 
+                    vec.rotation = vectorNode.rotation;
+                    vec.y = vectorNode.y;
+                    vec.x = vectorNode.x;
+
+                    console.log(`- Modified: x=${vec.x}, y=${vec.y}, rotation=${vec.rotation}`);
+                } else {
+                    console.log(`- Not modified (mask is not vertical)`);
+                }
+            }
+        });
         if (renameVectorsOutsideMasks(parent)) {
             renumberChildren(parent);
         }
