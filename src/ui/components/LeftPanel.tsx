@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { NetworkMessages } from "@common/network/messages";
 import svgs from '@ui/utils/forms.util';
 import TypeDropdown from "./TypeDropdown";
@@ -130,7 +130,7 @@ import TexturesDropdown from "./TexturesDropdown";
 
 
     const tabs = ["frames", "textures", "details", "effects"];
-    const [colors, setColors] = useState(["#0A64AD", "#FFFFFF", "#059DF5"]);
+    // const [colors, setColors] = useState(["#0A64AD", "#FFFFFF", "#059DF5"]);
     const [openDropdown, setOpenDropdown] = useState<Record<string, boolean>>({});
     const [searchTerm, setSearchTerm] = useState('');
     const [color1, setColor1] = useState("#0A64AD");
@@ -140,8 +140,64 @@ import TexturesDropdown from "./TexturesDropdown";
     const [lastAddedImage, setLastAddedImage] = useState<{ thumb_path: string, file_path: string } | null>(null);
     const [opacity, setOpacity] = useState(50);
     const [activeButton, setActiveButton] = useState<number | null>(null);
+
+    const adjustColorValue = (colorValue: number): number => {
+      if (colorValue < 128) {
+        return colorValue + 7;
+      } else {
+        return colorValue - 7;
+      }
+    };
+    
+    const adjustColor = (color: string): string => {
+      // Преобразование hex в rgb
+      const bigint = parseInt(color.slice(1), 16);
+      let r = (bigint >> 16) & 255;
+      let g = (bigint >> 8) & 255;
+      let b = bigint & 255;
+    
+      // Небольшое изменение цвета
+      r = adjustColorValue(r);
+      g = adjustColorValue(g);
+      b = adjustColorValue(b);
+    
+      // Преобразование обратно в hex и возврат
+      return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+    };
+
+    const onColorChange = (
+      setColor1: React.Dispatch<React.SetStateAction<string>>, 
+      setColor2: React.Dispatch<React.SetStateAction<string>>, 
+      setColor3: React.Dispatch<React.SetStateAction<string>>, 
+      newColor: string, 
+      color2: string,
+      color3: string
+  ): void => {
+      let adjustedColor1 = newColor;
+      let adjustedColor2 = color2;
+      let adjustedColor3 = color3;
+      
+      // Ваша текущая логика для коррекции цвета
+      while (adjustedColor1 === adjustedColor2 || adjustedColor1 === adjustedColor3 || adjustedColor2 === adjustedColor3) {
+          if (adjustedColor1 === adjustedColor2) {
+              adjustedColor2 = adjustColor(adjustedColor2);
+          } else if (adjustedColor1 === adjustedColor3) {
+              adjustedColor3 = adjustColor(adjustedColor3);
+          } else if (adjustedColor2 === adjustedColor3) {
+              adjustedColor3 = adjustColor(adjustedColor3);
+          }
+      }
+  
+      setColor1(adjustedColor1);
+      setColor2(adjustedColor2);
+      setColor3(adjustedColor3);
+  };
+  
+  
+    
+
     const [selectedTextures, setSelectedTextures] = useState<Record<string, string | null>>(
-      colors.reduce((acc, color) => ({ ...acc, [color]: null }), {})
+      [color1, color2, color3].reduce((acc, color) => ({ ...acc, [color]: null }), {})
     );
     
 
@@ -340,24 +396,24 @@ const updateSVGColors = (svgString: string): string => {
                   <div className="pallete">
                     Colors
                     <div className="pallete-colors">
-                      <input
-                        className="pallete-button"
-                        type="color"
-                        value={color1}
-                        onChange={(e) => setColor1(e.target.value)}
-                      />
-                      <input
-                        className="pallete-button"
-                        type="color"
-                        value={color2}
-                        onChange={(e) => setColor2(e.target.value)}
-                      />
-                      <input
-                        className="pallete-button"
-                        type="color"
-                        value={color3}
-                        onChange={(e) => setColor3(e.target.value)}
-                      />
+                    <input
+                      className="pallete-button"
+                      type="color"
+                      value={color1}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => onColorChange(setColor1, setColor2, setColor3, e.target.value, color2, color3)} 
+                    />
+                    <input
+                      className="pallete-button"
+                      type="color"
+                      value={color2}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => onColorChange(setColor1, setColor2, setColor3, e.target.value, color1, color3)} 
+                    />
+                    <input
+                      className="pallete-button"
+                      type="color"
+                      value={color3}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => onColorChange(setColor1, setColor2, setColor3, e.target.value, color1, color2)} 
+                    />
                     </div>
                     
                   </div>
