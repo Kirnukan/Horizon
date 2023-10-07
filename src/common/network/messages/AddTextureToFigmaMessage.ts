@@ -1,4 +1,5 @@
 import { NetworkSide } from "@common/network/sides";
+import { color } from "d3";
 import * as Networker from "monorepo-networker";
 
 interface Payload {
@@ -164,7 +165,7 @@ function handleToggleTexture(group: GroupNode, targetColor: string, newImageHash
                     console.log("Color matches target");
 
                     // Заменяем текстуру в Rectangle
-                    replaceTextureInRectangle(maskGroup, newImageHash);
+                    replaceTextureInRectangle(maskGroup, newImageHash, targetColor);
 
                     // Check if shouldToggle is not defined, then define it as true
                     if (vector.getPluginData("shouldToggle") === "") {
@@ -476,7 +477,7 @@ function renumberChildren(parent: GroupNode | FrameNode): void {
     });
 }
 
-function replaceTextureInRectangle(maskGroup: GroupNode, newImageHash: string): void {
+function replaceTextureInRectangle(maskGroup: GroupNode, newImageHash: string, color: string): void {
     // Ищем объект Rectangle в группе масок
     const rectangle = maskGroup.findOne(node => node.name === "Rectangle" && node.type === "RECTANGLE") as RectangleNode;
 
@@ -490,8 +491,10 @@ function replaceTextureInRectangle(maskGroup: GroupNode, newImageHash: string): 
         type: "IMAGE",
         scaleMode: "FILL",
         imageHash: newImageHash,
+        blendMode: (color.toLowerCase() !== "#ffffff" && color.toLowerCase() !== "#000000") ? "OVERLAY" : "NORMAL"
     }];
 }
+
 
 
 function createTextureRectangle(size: number, imageHash: string, color: string, opacity: number): RectangleNode {
