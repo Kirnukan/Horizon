@@ -31,6 +31,7 @@ function capitalizeFirstLetter(string: string): string {
 }
 
 
+
 // 1. Получение изображений по семейству и группе
 export const getImagesByFamilyGroupAndSubgroup = async (family: string, group: string, subgroup: string) => {
   const capitalizedFamily = capitalizeFirstLetter(family);
@@ -44,7 +45,10 @@ export const getImagesByFamilyGroupAndSubgroup = async (family: string, group: s
     throw new Error(`Failed to fetch images. ${errorMessage}`);
   }
   const data = await response.json();
-  return transformImagesData(data);
+  
+  const tID = transformImagesData(data);
+  console.log(tID)
+  return tID;
 };
 
 
@@ -94,4 +98,40 @@ export const getLeastUsedImagesByFamily = async (family: string, count = 6) => {
 // 5. Сервировка статических изображений
 export const getStaticImageUrl = (filename: string) => {
   return `${BASE_URL}/static/images/${filename}`;
+};
+
+export const removeUntilStatic = (input: string): string => {
+  const regex = /^.*\/static/;
+  return input.replace(regex, '/static');
+}
+
+export const replaceInPath = (path: string, substitude: string, item: string): string => {
+  return path.replace(substitude, item)
+};
+
+export const increaseImageUsage = async (thumbPath: string) => {
+  thumbPath = removeUntilStatic(thumbPath)
+  console.log('thumbPath',thumbPath)
+  try {
+    // console.log(`Sending POST request to: ${BASE_URL}/increase-usage${thumbPath}`);
+    // console.log('About to fetch:', `${BASE_URL}/increase-usage${thumbPath}`);
+    // console.log('Using fetch function:', fetch.toString());
+    const response = await fetch(`${BASE_URL}/increase-usage${thumbPath}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    console.log('Response:', response);
+
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      throw new Error(`Failed to increase image usage. ${errorMessage}`);
+    }
+
+    return response
+
+  } catch (error) {
+    throw error;
+  }
 };

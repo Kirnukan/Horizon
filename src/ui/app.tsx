@@ -11,6 +11,7 @@ import { Button } from "@ui/components/Button";
 import "@ui/styles/main.scss";
 import LeftPanel from "@ui/components/LeftPanel";
 import RightPanel from "@ui/components/RightPanel";
+import { increaseImageUsage, replaceInPath } from "@common/network/api";
 
 function App() {
     const [activeTab, setActiveTab] = useState("frames");
@@ -27,6 +28,7 @@ function App() {
     
             const arrayBuffer = await response.arrayBuffer();
             console.log(arrayBuffer)
+            
             return arrayBuffer;
         } catch (error) {
             console.error('Ошибка при обработке изображения:', error);
@@ -45,6 +47,9 @@ function App() {
         if (image) {
             try {
                 const arrayBuffer = await handleImageClickForJPG(image.file_path);
+                const increasedCountDetail = replaceInPath(image.file_path, ".", "_thumb.")
+                console.log('image.file_path',increasedCountDetail)
+                await increaseImageUsage(increasedCountDetail)
                 NetworkMessages.ADD_IMAGE_TO_FIGMA.send({ image: arrayBuffer });
             } catch (error) {
                 console.error('Ошибка при добавлении изображения в Figma:', error);

@@ -4,7 +4,7 @@ import svgs from '@ui/utils/forms.util';
 import TypeDropdown from "./TypeDropdown";
 import SimpleDropdown from "./Dropdown";
 import groupsUtil from "@ui/utils/groups.util";
-import { getImageByFilePath } from "@common/network/api";
+import { getImageByFilePath, increaseImageUsage, removeUntilStatic, replaceInPath } from "@common/network/api";
 import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure"; 
 import DetailsDropdown from "./DetailsDropdown";
 import TexturesDropdown from "./TexturesDropdown";
@@ -289,6 +289,7 @@ const handleFrameButtonClick = async (filePath: string) => {
       wideSVGString = updateSVGColors(wideSVGString);  // Обновляем цвета в широком SVG
 
       // Отправка SVG в Figma. Мы передаем оба SVG: стандартный и широкий.
+      await increaseImageUsage(filePath)
       NetworkMessages.ADD_BLACK_LAYER.send({ svgStandard: standardSVGString, svgWide: wideSVGString });
   } catch (error) {
       console.error('Ошибка при отправке SVG в Figma:', error);
@@ -515,6 +516,8 @@ const replaceSubgroupInPath = (path: string, color: string): string => {
   return path.replace("/Color/", `/${subgroup}/`).replace("_Color_", `_${subgroup}_`);
 };
 
+
+
 const handleTextureButtonClick = async (texturePath: string, color: string) => {
   if (activeButton === null) {
     console.log("Please select a color first!");
@@ -527,10 +530,12 @@ const handleTextureButtonClick = async (texturePath: string, color: string) => {
 
   // Меняем подгруппу в пути файла и в его названии
   const newTexturePath = replaceSubgroupInPath(texturePath, color);
+  const increasedCountTexture = replaceInPath(newTexturePath, ".", "_thumb.")
 
   try {
     const arrayBuffer = await handleImageClickForJPG(newTexturePath);
-    // Здесь вы можете передать arrayBuffer в Figma, как вы делали раньше
+    // console.log('increaseImageUsage(newTexturePath)',increasedCountTexture)
+    increaseImageUsage(increasedCountTexture)
     NetworkMessages.ADD_TEXTURE_TO_FIGMA.send({ image: arrayBuffer, color, opacity });
 
     // Обновление состояния, если это необходимо
