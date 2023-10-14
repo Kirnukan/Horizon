@@ -216,6 +216,27 @@ export const tabsData: Tab[] = [
   },
   {
     name: "Effects",
-    groups: [], // Здесь можно добавить группы для Effects
+    groups: [
+      {
+        title: "Effects",
+        subgroups: [
+          {
+            title: "Effects1",
+            imageActive: groupsUtil.imageActive1,
+            imagePassive: groupsUtil.imagePassive1
+          },
+          {
+            title: "Effects2",
+            imageActive: groupsUtil.imageActive2,
+            imagePassive: groupsUtil.imagePassive2
+          },
+          {
+            title: "Effects3",
+            imageActive: groupsUtil.imageActive3,
+            imagePassive: groupsUtil.imagePassive3
+          },
+        ]
+      },
+    ], // Здесь можно добавить группы для Effects
   },
 ];

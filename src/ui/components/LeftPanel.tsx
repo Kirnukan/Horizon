@@ -8,6 +8,7 @@ import { getImageByFilePath, increaseImageUsage, removeUntilStatic, replaceInPat
 import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure"; 
 import DetailsDropdown from "./DetailsDropdown";
 import TexturesDropdown from "./TexturesDropdown";
+import EffectsDropdown from "./EffectsDropdown";
 
 
 
@@ -133,9 +134,9 @@ import TexturesDropdown from "./TexturesDropdown";
     // const [colors, setColors] = useState(["#0A64AD", "#FFFFFF", "#059DF5"]);
     const [openDropdown, setOpenDropdown] = useState<Record<string, boolean>>({});
     const [searchTerm, setSearchTerm] = useState('');
-    const [color1, setColor1] = useState("#0A64AD");
+    const [color1, setColor1] = useState("#000000");
     const [color2, setColor2] = useState("#FFFFFF");
-    const [color3, setColor3] = useState("#059DF5");
+    const [color3, setColor3] = useState("#D4440B");
     const [currentSVG, setCurrentSVG] = useState<string | null>(null);
     const [lastAddedImage, setLastAddedImage] = useState<{ thumb_path: string, file_path: string } | null>(null);
     const [opacity, setOpacity] = useState(50);
@@ -143,9 +144,9 @@ import TexturesDropdown from "./TexturesDropdown";
 
     const adjustColorValue = (colorValue: number): number => {
       if (colorValue < 128) {
-        return colorValue + 7;
+        return colorValue + 4;
       } else {
-        return colorValue - 7;
+        return colorValue - 4;
       }
     };
     
@@ -166,32 +167,22 @@ import TexturesDropdown from "./TexturesDropdown";
     };
 
     const onColorChange = (
-      setColor1: React.Dispatch<React.SetStateAction<string>>, 
-      setColor2: React.Dispatch<React.SetStateAction<string>>, 
-      setColor3: React.Dispatch<React.SetStateAction<string>>, 
+      setColorFunc: React.Dispatch<React.SetStateAction<string>>, 
       newColor: string, 
-      color2: string,
-      color3: string
+      ...otherColors: string[]
   ): void => {
-      let adjustedColor1 = newColor;
-      let adjustedColor2 = color2;
-      let adjustedColor3 = color3;
+      let adjustedColor = newColor;
       
-      // Ваша текущая логика для коррекции цвета
-      while (adjustedColor1 === adjustedColor2 || adjustedColor1 === adjustedColor3 || adjustedColor2 === adjustedColor3) {
-          if (adjustedColor1 === adjustedColor2) {
-              adjustedColor2 = adjustColor(adjustedColor2);
-          } else if (adjustedColor1 === adjustedColor3) {
-              adjustedColor3 = adjustColor(adjustedColor3);
-          } else if (adjustedColor2 === adjustedColor3) {
-              adjustedColor3 = adjustColor(adjustedColor3);
-          }
+      // Проверка, совпадает ли новый цвет с другими цветами
+      while (otherColors.includes(adjustedColor)) {
+          // Если совпадает, немного измените его
+          adjustedColor = adjustColor(adjustedColor);
       }
   
-      setColor1(adjustedColor1);
-      setColor2(adjustedColor2);
-      setColor3(adjustedColor3);
+      // Устанавливаем новый цвет
+      setColorFunc(adjustedColor);
   };
+  
   
   
     
@@ -316,6 +307,19 @@ const handleDetailButtonClick = (filePath: string) => {
   }
 };
 
+const handleEffectsButtonClick = async (filePath: string) => {
+  console.log("Button clicked:", filePath);
+  try {
+    const arrayBuffer = await handleImageClickForJPG(filePath);
+    const increasedCountEffect = replaceInPath(filePath, ".", "_thumb.")
+
+    increaseImageUsage(increasedCountEffect)
+    NetworkMessages.ADD_EFFECT_TO_FIGMA.send({ image: arrayBuffer });
+  } catch (error) {
+    console.error('Ошибка при добавлении текстуры в Figma:', error);
+  }
+};
+
 useEffect(() => {
   const sendImageToFigma = async (image: { thumb_path: string, file_path: string }) => {
     try {
@@ -397,24 +401,25 @@ const updateSVGColors = (svgString: string): string => {
                   <div className="pallete">
                     Colors
                     <div className="pallete-colors">
-                    <input
-                      className="pallete-button"
-                      type="color"
-                      value={color1}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => onColorChange(setColor1, setColor2, setColor3, e.target.value, color2, color3)} 
-                    />
-                    <input
-                      className="pallete-button"
-                      type="color"
-                      value={color2}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => onColorChange(setColor1, setColor2, setColor3, e.target.value, color1, color3)} 
-                    />
-                    <input
-                      className="pallete-button"
-                      type="color"
-                      value={color3}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => onColorChange(setColor1, setColor2, setColor3, e.target.value, color1, color2)} 
-                    />
+                      <input
+                          className="pallete-button"
+                          type="color"
+                          value={color1}
+                          onChange={(e: ChangeEvent<HTMLInputElement>) => onColorChange(setColor1, e.target.value, color2, color3)} 
+                      />
+                      <input
+                          className="pallete-button"
+                          type="color"
+                          value={color2}
+                          onChange={(e: ChangeEvent<HTMLInputElement>) => onColorChange(setColor2, e.target.value, color1, color3)} 
+                      />
+                      <input
+                          className="pallete-button"
+                          type="color"
+                          value={color3}
+                          onChange={(e: ChangeEvent<HTMLInputElement>) => onColorChange(setColor3, e.target.value, color1, color2)} 
+                      />
+
                     </div>
                     
                   </div>
@@ -534,7 +539,6 @@ const handleTextureButtonClick = async (texturePath: string, color: string) => {
 
   try {
     const arrayBuffer = await handleImageClickForJPG(newTexturePath);
-    // console.log('increaseImageUsage(newTexturePath)',increasedCountTexture)
     increaseImageUsage(increasedCountTexture)
     NetworkMessages.ADD_TEXTURE_TO_FIGMA.send({ image: arrayBuffer, color, opacity });
 
@@ -601,6 +605,20 @@ const handleTextureButtonClick = async (texturePath: string, color: string) => {
                     group={group.title}
                     subgroup={subgroup.title}
                     onImageClick={handleDetailButtonClick}
+                  />
+                  
+              ) : tabId === 'effects' ? ( 
+                  <EffectsDropdown 
+                    key={subgroup.title}
+                    title={subgroup.title}
+                    imageActive={subgroup.imageActive}
+                    imagePassive={subgroup.imagePassive}
+                    isOpen={openDropdown[subgroup.title] || false}
+                    onOpen={() => handleOpenDropdown(subgroup.title)}
+                    family={tabId}
+                    group={group.title}
+                    subgroup={subgroup.title}
+                    onImageEffectClick={handleEffectsButtonClick}
                   />
               ) : tabId === 'textures' ? (
                   <TexturesDropdown 
