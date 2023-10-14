@@ -11,28 +11,35 @@ export class RotateFrameMessage extends Networker.MessageType<{}> {
     
         nodes.forEach(node => {
             if (node.type === "FRAME" && node.width === node.height) {
-                const lastChild = node.children[node.children.length - 1];
-                if (lastChild && "rotation" in lastChild) {
+                let lastFrameChild = null;
+
+                // Итерируемся по детям node
+                for (const child of node.children) {
+                    if (child.type === "FRAME") {
+                        lastFrameChild = child;
+                    }
+                }
+
+                if (lastFrameChild && "rotation" in lastFrameChild) {
                     // Поворачиваем изображение против часовой стрелки
-                    lastChild.rotation = (lastChild.rotation - 90) % 360;
-                    const roundedRotation = Math.round(lastChild.rotation);
+                    lastFrameChild.rotation = (lastFrameChild.rotation - 90) % 360;
+                    const roundedRotation = Math.round(lastFrameChild.rotation);
                     console.log(roundedRotation)
                     if (roundedRotation === 0 || roundedRotation === 360) {
-                        lastChild.x = 0;
-                        lastChild.y = 0;
+                        lastFrameChild.x = 0;
+                        lastFrameChild.y = 0;
                     } else if (roundedRotation === -90 || roundedRotation === 270) {
-                        lastChild.x = +node.width;
-                        lastChild.y = 0;
+                        lastFrameChild.x = +node.width;
+                        lastFrameChild.y = 0;
                     } else if (roundedRotation === -180 || roundedRotation === 180) {
-                        lastChild.x = +node.width;
-                        lastChild.y = +node.height;
+                        lastFrameChild.x = +node.width;
+                        lastFrameChild.y = +node.height;
                     } else if (roundedRotation === -270 || roundedRotation === 90) {
-                        lastChild.x = 0;
-                        lastChild.y = +node.height;
+                        lastFrameChild.x = 0;
+                        lastFrameChild.y = +node.height;
                     }
                 }
             }
         });
     }
-    
 }

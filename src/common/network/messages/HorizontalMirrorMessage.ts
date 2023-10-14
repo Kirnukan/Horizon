@@ -11,17 +11,25 @@ export class HorizontalMirrorMessage extends Networker.MessageType<{}> {
 
         nodes.forEach(node => {
             if (node.type === "FRAME" && node.width > node.height) {  
-                const lastChild = node.children[node.children.length - 1];
-                if (lastChild && "rotation" in lastChild) {
-                    lastChild.rotation = (lastChild.rotation + 180) % 360;
-                    const roundedRotation = Math.round(lastChild.rotation);
+                let lastFrameChild = null;
+
+                // Итерируемся по детям node
+                for (const child of node.children) {
+                    if (child.type === "FRAME") {
+                        lastFrameChild = child;
+                    }
+                }
+
+                if (lastFrameChild && "rotation" in lastFrameChild) {
+                    lastFrameChild.rotation = (lastFrameChild.rotation + 180) % 360;
+                    const roundedRotation = Math.round(lastFrameChild.rotation);
                     console.log(roundedRotation)
                     if (roundedRotation === 0 || roundedRotation === 360) {
-                        lastChild.x = 0;
-                        lastChild.y = 0;
+                        lastFrameChild.x = 0;
+                        lastFrameChild.y = 0;
                     } else if (roundedRotation === 180) {
-                        lastChild.y = +node.height;
-                        lastChild.x = +node.width;
+                        lastFrameChild.y = +node.height;
+                        lastFrameChild.x = +node.width;
                     }
                 }
             }
