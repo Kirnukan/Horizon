@@ -144,7 +144,22 @@
     }
     
     
-    
+    .notification {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: #f8d7da;  // Цвет фона для уведомления (красный)
+      color: #721c24;  // Цвет текста для уведомления (темно-красный)
+      padding: 10px 20px;
+      border-radius: 5px;
+      border: 1px solid #f5c6cb;  // Цвет рамки для уведомления (светло-красный)
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);  // Тень для уведомления
+      font-size: 14px;
+      font-weight: bold;
+      z-index: 1000;  // Убедитесь, что уведомление отображается поверх других элементов
+      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;  // Плавный переход для уведомления
+    }
     
     
 
@@ -353,6 +368,8 @@
         }
       }
       
+
+
       .buttons {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));

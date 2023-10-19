@@ -74,24 +74,37 @@ export const searchImagesByKeywordAndFamily = async (keyword: string, family?: s
   if (family) {
     params.family = family;
   }
+  console.log('search',params)
+
   const response = await fetch(createUrl('/search', params));
+  console.log('search',response)
+
   if (!response.ok) {
     const errorMessage = await response.text();
     throw new Error(`Failed to search images. ${errorMessage}`);
   }
   const data = await response.json();
+  console.log('search',data)
+
   return transformImagesData(data);
 };
 
 // 4. Получение наименее используемых изображений по семейству
 export const getLeastUsedImagesByFamily = async (family: string, count = 6) => {
   const capitalizedFamily = capitalizeFirstLetter(family);
-  const response = await fetch(createUrl('/least-used', { capitalizedFamily, count }));
+  const params: Record<string, string | number> = {
+    family: capitalizedFamily,
+    count
+  };
+  console.log('least',params)
+  const response = await fetch(createUrl('/least-used', params));
+  console.log('least',response)
   if (!response.ok) {
     const errorMessage = await response.text();
     throw new Error(`Failed to fetch least used images. ${errorMessage}`);
   }
   const data = await response.json();
+  console.log('least',data)
   return transformImagesData(data);
 };
 

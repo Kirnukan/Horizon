@@ -4,7 +4,7 @@ import svgs from '@ui/utils/forms.util';
 import TypeDropdown from "./TypeDropdown";
 import SimpleDropdown from "./Dropdown";
 import groupsUtil from "@ui/utils/groups.util";
-import { getImageByFilePath, increaseImageUsage, removeUntilStatic, replaceInPath } from "@common/network/api";
+import { getImageByFilePath, getLeastUsedImagesByFamily, increaseImageUsage, removeUntilStatic, replaceInPath, searchImagesByKeywordAndFamily } from "@common/network/api";
 import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure"; 
 import DetailsDropdown from "./DetailsDropdown";
 import TexturesDropdown from "./TexturesDropdown";
@@ -25,61 +25,7 @@ import EffectsDropdown from "./EffectsDropdown";
     </button>
   );
 
-  const SearchBar: React.FC<{ searchTerm: string, setSearchTerm: (term: string) => void }> = ({ searchTerm, setSearchTerm }) => {
-    const inputRef = useRef<HTMLInputElement | null>(null);
-    const getTextWidth = (text: string, font: string) => {
-      const canvas = document.createElement("canvas");
-      const context = canvas.getContext("2d");
-      if (!context) return 0;
-      context.font = font;
-      const metrics = context.measureText(text);
-      return metrics.width;
-    };
-    
-    useEffect(() => {
-      if (inputRef.current) {
-          const icon = inputRef.current.nextSibling as HTMLElement;
-          if (icon) {
-              const inputWidth = inputRef.current.clientWidth;
-              const font = getComputedStyle(inputRef.current).font;
-              const textWidth = getTextWidth(searchTerm, font);
-              const iconWidth = 12;
-              let padding = 5; // стандартное расстояние от текста
-              
-              // Если поле ввода пустое и отображается только placeholder
-              if (searchTerm === '') {
-                  padding = 25; // устанавливаем расстояние в 30px от центра поля
-              }
-    
-              let rightPosition = (inputWidth - textWidth) / 2 - iconWidth - padding;
-    
-              // Проверяем, чтобы иконка не выходила за границы поля ввода
-              if (rightPosition < padding) {
-                  icon.style.display = 'none'; // Скрываем иконку
-              } else {
-                  icon.style.display = 'block'; // Показываем иконку
-                  icon.style.right = `${rightPosition}px`;
-              }
-          }
-      }
-    }, [searchTerm]);
-    
-    return (
-      <div className="search-container">
-        <input
-            ref={inputRef}
-            type="text"
-            className="search-input"
-            placeholder="Search"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <svg className="search-icon" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M11.8175 10.9301L8.85934 7.95969C9.61995 7.08675 10.0367 5.98841 10.0367 4.845C10.0367 2.17351 7.78542 0 5.01834 0C2.25127 0 0 2.17351 0 4.845C0 7.51648 2.25127 9.68999 5.01834 9.68999C6.05714 9.68999 7.04707 9.38749 7.89342 8.81326L10.8741 11.8062C10.9987 11.9311 11.1663 12 11.3458 12C11.5158 12 11.677 11.9374 11.7994 11.8237C12.0595 11.5821 12.0678 11.1814 11.8175 10.9301ZM5.01834 1.26391C7.06365 1.26391 8.72756 2.87034 8.72756 4.845C8.72756 6.81965 7.06365 8.42608 5.01834 8.42608C2.97304 8.42608 1.30913 6.81965 1.30913 4.845C1.30913 2.87034 2.97304 1.26391 5.01834 1.26391Z" fill="#C3CCE6"/>
-        </svg>
-      </div>
-    );
-  }
+
 
   interface LeftPanelProps {
     activeTab: string;
@@ -88,6 +34,7 @@ import EffectsDropdown from "./EffectsDropdown";
     images: Array<{ thumb_path: string, file_path: string } | null>;
     handleImageClick: (index: number) => void;
   }
+
 
 
 
@@ -141,6 +88,120 @@ import EffectsDropdown from "./EffectsDropdown";
     const [lastAddedImage, setLastAddedImage] = useState<{ thumb_path: string, file_path: string } | null>(null);
     const [opacity, setOpacity] = useState(50);
     const [activeButton, setActiveButton] = useState<number | null>(null);
+    const [searchResults, setSearchResults] = useState<ButtonData[]>([]);
+    const [tabId, setTabId] = useState<string>('frames');
+    const [notification, setNotification] = useState('');
+    const [rarelyUsedImages, setRarelyUsedImages] = useState<ButtonData[]>([]);
+
+    useEffect(() => {
+      const fetchRarelyUsedImages = async (idTab:string) => {
+        try {
+          const images = await getLeastUsedImagesByFamily(idTab); // предполагая, что tabId - это текущее семейство
+          setRarelyUsedImages(images);
+        } catch (error) {
+          console.error('Failed to fetch rarely used images:', error);
+        }
+      };
+      
+      fetchRarelyUsedImages(tabId);
+    }, [tabId]); 
+    interface ButtonData {
+      thumb_path: string;
+      file_path: string;
+    }
+  
+    const handleSearch = async (keyword: string, idTab: string) => {
+      try {
+          // Проверка на пустую строку или строку, состоящую только из пробелов
+          if (!keyword || !keyword.trim()) {
+              setSearchResults([])
+              setNotification('Введите название');
+              return;  // Выйти из функции, если ключевое слово невалидно
+          }
+
+          const results = await searchImagesByKeywordAndFamily(keyword, idTab);
+          console.log('results', results);
+          if (results && results.length > 0) {
+              setSearchResults(results);
+              setNotification('');  // Очистить уведомление, если были найдены результаты
+          } else {
+              
+              setNotification('Ничего не найдено');
+          }
+      } catch (error) {
+          setSearchResults([])
+          console.error('Error searching for images:', error);
+      }
+  };
+
+  const SearchBar: React.FC<{ searchTerm: string, setSearchTerm: (term: string) => void, tabId: string}> = ({ searchTerm, setSearchTerm, tabId }) => {
+    const inputRef = useRef<HTMLInputElement | null>(null);
+    const getTextWidth = (text: string, font: string) => {
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+      if (!context) return 0;
+      context.font = font;
+      const metrics = context.measureText(text);
+      return metrics.width;
+    };
+    
+    useEffect(() => {
+      if (inputRef.current) {
+          inputRef.current.focus();
+          const icon = inputRef.current.nextSibling as HTMLElement;
+          if (icon) {
+              const inputWidth = inputRef.current.clientWidth;
+              const font = getComputedStyle(inputRef.current).font;
+              const textWidth = getTextWidth(searchTerm, font);
+              const iconWidth = 12;
+              let padding = 5; // стандартное расстояние от текста
+              
+              // Если поле ввода пустое и отображается только placeholder
+              if (searchTerm === '') {
+                  padding = 25; // устанавливаем расстояние в 30px от центра поля
+              }
+    
+              let rightPosition = (inputWidth - textWidth) / 2 - iconWidth - padding;
+    
+              // Проверяем, чтобы иконка не выходила за границы поля ввода
+              if (rightPosition < padding) {
+                  icon.style.display = 'none'; // Скрываем иконку
+              } else {
+                  icon.style.display = 'block'; // Показываем иконку
+                  icon.style.right = `${rightPosition}px`;
+              }
+          }
+      }
+    }, [searchTerm]);
+    
+    return (
+      <div className="search-container">
+        <input
+          ref={inputRef}
+          type="text"
+          className="search-input"
+          placeholder="Search"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                console.log('handlesearch ',searchTerm, tabId);
+                handleSearch(searchTerm, tabId)
+            }
+          }}
+
+
+          
+        />
+
+        <svg className="search-icon" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11.8175 10.9301L8.85934 7.95969C9.61995 7.08675 10.0367 5.98841 10.0367 4.845C10.0367 2.17351 7.78542 0 5.01834 0C2.25127 0 0 2.17351 0 4.845C0 7.51648 2.25127 9.68999 5.01834 9.68999C6.05714 9.68999 7.04707 9.38749 7.89342 8.81326L10.8741 11.8062C10.9987 11.9311 11.1663 12 11.3458 12C11.5158 12 11.677 11.9374 11.7994 11.8237C12.0595 11.5821 12.0678 11.1814 11.8175 10.9301ZM5.01834 1.26391C7.06365 1.26391 8.72756 2.87034 8.72756 4.845C8.72756 6.81965 7.06365 8.42608 5.01834 8.42608C2.97304 8.42608 1.30913 6.81965 1.30913 4.845C1.30913 2.87034 2.97304 1.26391 5.01834 1.26391Z" fill="#C3CCE6"/>
+        </svg>
+      </div>
+    );
+  }
+
 
     const adjustColorValue = (colorValue: number): number => {
       if (colorValue < 128) {
@@ -567,12 +628,63 @@ const handleTextureButtonClick = async (texturePath: string, color: string) => {
     );
     return (
       <div className="tab-content">
-        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-        {tabId === 'frames' && renderFramesContent()}
-        {tabId === 'details' && renderDetailsContent()}
-        {tabId === 'textures' && renderTexturesContent()}
-        {tabId === 'effects' && renderEffectsContent()}
+        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} tabId={tabId} />
+
         
+
+        {searchResults.length > 0 ? (
+          <>
+            <div className="buttons">
+                {searchResults.map((button, index) => (
+                              <button
+                                key={index}
+                                className={`dropdown-button`}
+                                style={{ backgroundImage: `url(${button.thumb_path})` }}
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  // console.log("Button clicked with:", button.file_path, selectedColor);  // <-- добавьте эту строку
+                                  // onTextureClick(button.file_path, selectedColor);
+                              }}
+                            >
+                                <img src={button.thumb_path} alt="Texture Preview" />
+                            </button>
+                ))}
+            </div>
+                {tabId === 'frames' && renderFramesContent()}
+                {tabId === 'details' && renderDetailsContent()}
+                {tabId === 'textures' && renderTexturesContent()}
+                {tabId === 'effects' && renderEffectsContent()}
+            </>
+        ) : (
+            <>
+                {tabId === 'frames' && renderFramesContent()}
+                {tabId === 'details' && renderDetailsContent()}
+                {tabId === 'textures' && renderTexturesContent()}
+                {tabId === 'effects' && renderEffectsContent()}
+            </>
+        )}
+        
+        <SimpleDropdown key={"Rarely used"} title={"Rarely used"}>
+          <div className="buttons">
+            {rarelyUsedImages.map((button, index) => (
+              <button
+                key={index}
+                className={`dropdown-button`}
+                style={{ backgroundImage: `url(${button.thumb_path})` }}
+                value={tabId}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  
+                  // здесь ваш код обработки нажатия на изображение
+                }}
+              >
+                <img src={button.thumb_path} alt="Texture Preview" />
+              </button>
+            ))}
+          </div>
+        </SimpleDropdown>
+
+
         {tabData.groups.map((group: Group) => (
           <SimpleDropdown key={group.title} title={group.title}>
             <div className="type-dropdown-container">
