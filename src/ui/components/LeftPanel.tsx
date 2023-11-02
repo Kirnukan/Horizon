@@ -9,6 +9,7 @@ import { tabsData, Tab, Group, Subgroup } from "@ui/utils/dataStructure";
 import DetailsDropdown from "./DetailsDropdown";
 import TexturesDropdown from "./TexturesDropdown";
 import EffectsDropdown from "./EffectsDropdown";
+import RarelyUsed from "./RarelyUsed";
 
 
 
@@ -93,18 +94,18 @@ import EffectsDropdown from "./EffectsDropdown";
     const [notification, setNotification] = useState('');
     const [rarelyUsedImages, setRarelyUsedImages] = useState<ButtonData[]>([]);
 
-    useEffect(() => {
-      const fetchRarelyUsedImages = async (idTab:string) => {
-        try {
-          const images = await getLeastUsedImagesByFamily(idTab); // предполагая, что tabId - это текущее семейство
-          setRarelyUsedImages(images);
-        } catch (error) {
-          console.error('Failed to fetch rarely used images:', error);
-        }
-      };
+    // useEffect(() => {
+    //   const fetchRarelyUsedImages = async (idTab:string) => {
+    //     try {
+    //       const images = await getLeastUsedImagesByFamily(idTab); // предполагая, что tabId - это текущее семейство
+    //         setRarelyUsedImages(images);
+    //     } catch (error) {
+    //       console.error('Failed to fetch rarely used images:', error);
+    //     }
+    //   };
       
-      fetchRarelyUsedImages(tabId);
-    }, [tabId]); 
+    //   fetchRarelyUsedImages(tabId);
+    // }, [tabId]); 
     interface ButtonData {
       thumb_path: string;
       file_path: string;
@@ -663,26 +664,7 @@ const handleTextureButtonClick = async (texturePath: string, color: string) => {
                 {tabId === 'effects' && renderEffectsContent()}
             </>
         )}
-        
-        <SimpleDropdown key={"Rarely used"} title={"Rarely used"}>
-          <div className="buttons">
-            {rarelyUsedImages.map((button, index) => (
-              <button
-                key={index}
-                className={`dropdown-button`}
-                style={{ backgroundImage: `url(${button.thumb_path})` }}
-                value={tabId}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  
-                  // здесь ваш код обработки нажатия на изображение
-                }}
-              >
-                <img src={button.thumb_path} alt="Texture Preview" />
-              </button>
-            ))}
-          </div>
-        </SimpleDropdown>
+        <RarelyUsed tabId={tabId} />
 
 
         {tabData.groups.map((group: Group) => (
