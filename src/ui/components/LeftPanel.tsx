@@ -664,7 +664,22 @@ const handleTextureButtonClick = async (texturePath: string, color: string) => {
                 {tabId === 'effects' && renderEffectsContent()}
             </>
         )}
-        <RarelyUsed tabId={tabId} />
+        <RarelyUsed
+  tabId={tabId}
+  selectedColor={
+    activeButton === 0 ? color1 :
+    activeButton === 1 ? color2 :
+    color3
+  }
+  onFrameClick={handleFrameButtonClick}
+  onDetailClick={handleDetailButtonClick}
+  onEffectClick={handleEffectsButtonClick}
+  onTextureClick={handleTextureButtonClick}
+  color1={color1}
+  color2={color2}
+  color3={color3}
+/>
+
 
 
         {tabData.groups.map((group: Group) => (

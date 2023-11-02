@@ -10,9 +10,27 @@ interface ButtonData {
 
 interface RarelyUsedProps {
   tabId: string;
+  selectedColor: string;
+  onFrameClick?: (filePath: string, color1: string, color2: string, color3: string) => void;
+  onDetailClick?: (filePath: string) => void;
+  onEffectClick?: (filePath: string) => void;
+  onTextureClick?: (filePath: string, selectedColor: string) => void;
+  color1?: string;
+  color2?: string;
+  color3?: string;
 }
 
-const RarelyUsed: React.FC<RarelyUsedProps> = ({ tabId }) => {
+const RarelyUsed: React.FC<RarelyUsedProps> = ({
+  tabId,
+  selectedColor,
+  onFrameClick,
+  onDetailClick,
+  onEffectClick,
+  onTextureClick,
+  color1,
+  color2,
+  color3
+}) => {
   const [rarelyUsedImages, setRarelyUsedImages] = useState<ButtonData[]>([]);
 
   useEffect(() => {
@@ -27,19 +45,60 @@ const RarelyUsed: React.FC<RarelyUsedProps> = ({ tabId }) => {
 
     fetchRarelyUsedImages();
   }, [tabId]); // Зависимость от tabId обеспечивает обновление при смене вкладки
+  
+  // Функция для выбора обработчика нажатия кнопки на основе tabId
+  const getClickHandler = (file_path: string) => {
+    switch (tabId) {
+      case 'frames':
+        return () => {
+          if (onFrameClick) {
+            return onFrameClick(file_path, color1!, color2!, color3!); // '!' используется для утверждения, что значения определены
+          }
+        }
+      case 'details':
+        return () => {
+          if (onDetailClick) {
+            return onDetailClick(file_path);
+          }
+        }
+      case 'effects':
+        return () => {
+          if (onEffectClick) {
+            return onEffectClick(file_path);
+          }
+        }
+      case 'textures':
+        // Здесь вы должны определить, какие данные передать
+        // Например: selectedColor и selectedTexture
+        return () => {
+          if(onTextureClick){
+            onTextureClick(file_path, selectedColor);
+          }
+        }
+      default:
+        return undefined;
+    }
+  };
 
   return (
     <div className="rarely-used-container">
       <div className="rarely-used-header">Rarely used</div>
-      <div className="buttons">
+        <div className="buttons">
         {rarelyUsedImages.map((button, index) => (
           <button
             key={index}
             className="dropdown-button"
-            style={{ backgroundImage: `url(${button.thumb_path})` }}
+            style={{
+              backgroundImage: `url(${button.thumb_path})`,
+              // Добавить изменение цвета для вкладки 'frames'
+              // backgroundColor: tabId === 'frames' ? someColorFunction(index) : 'initial'
+            }}
             onClick={(event) => {
               event.stopPropagation();
-              // Обработка нажатия на изображение
+              const clickHandler = getClickHandler(button.file_path);
+              if (clickHandler) {
+                clickHandler();
+              }
             }}
           >
             <img src={button.thumb_path} alt="Image preview" />
