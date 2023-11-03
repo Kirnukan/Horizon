@@ -12,7 +12,7 @@ interface RarelyUsedProps {
   tabId: string;
   selectedColor: string;
   onFrameClick?: (filePath: string, color1: string, color2: string, color3: string) => void;
-  onDetailClick?: (filePath: string) => void;
+  onDetailClick?: (filePath: string, event: React.MouseEvent<HTMLButtonElement>) => void;
   onEffectClick?: (filePath: string) => void;
   onTextureClick?: (filePath: string, selectedColor: string) => void;
   color1?: string;
@@ -56,11 +56,11 @@ const RarelyUsed: React.FC<RarelyUsedProps> = ({
           }
         }
       case 'details':
-        return () => {
+        return (event: React.MouseEvent<HTMLButtonElement>) => {
           if (onDetailClick) {
-            return onDetailClick(file_path);
+            return onDetailClick(file_path, event);
           }
-        }
+        };
       case 'effects':
         return () => {
           if (onEffectClick) {
@@ -97,7 +97,7 @@ const RarelyUsed: React.FC<RarelyUsedProps> = ({
               event.stopPropagation();
               const clickHandler = getClickHandler(button.file_path);
               if (clickHandler) {
-                clickHandler();
+                clickHandler(event);
               }
             }}
           >

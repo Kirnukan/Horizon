@@ -48,7 +48,7 @@ function App() {
             try {
                 const arrayBuffer = await handleImageClickForJPG(image.file_path);
                 const increasedCountDetail = replaceInPath(image.file_path, ".", "_thumb.")
-                console.log('image.file_path',increasedCountDetail)
+                // console.log('image.file_path',increasedCountDetail)
                 await increaseImageUsage(increasedCountDetail)
                 NetworkMessages.ADD_IMAGE_TO_FIGMA.send({ image: arrayBuffer });
             } catch (error) {

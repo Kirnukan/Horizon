@@ -353,24 +353,26 @@ const handleFrameButtonClick = async (filePath: string) => {
 };
 
 
-
-const handleDetailButtonClick = (filePath: string) => {
-  console.log("Button clicked:", filePath);
-  
-  // Создаем объект изображения
-  const newImage = {thumb_path: filePath, file_path: filePath};
-  
-  // Добавляем изображение в состояние
-  addToRightPanel(newImage);
-
-  // Получаем индекс только что добавленного изображения
-  const addedImageIndex = images.findIndex(img => img && img.thumb_path === newImage.thumb_path && img.file_path === newImage.file_path);
-  
-  // Если индекс найден, вызываем handleImageClick
-  if (addedImageIndex !== -1) {
-    // handleImageClick(addedImageIndex);
+const handleDetailButtonClick = async (filePath: string, event: React.MouseEvent<HTMLButtonElement>) => {
+  if (event.type === 'click') { // Левый клик
+    console.log("Left click:", filePath);
+    try {
+      const arrayBuffer = await handleImageClickForJPG(filePath);
+      const increasedCountDetail = replaceInPath(filePath, ".", "_thumb.");
+      await increaseImageUsage(increasedCountDetail);
+      NetworkMessages.ADD_IMAGE_TO_FIGMA.send({ image: arrayBuffer });
+    } catch (error) {
+      console.error("An error occurred while handling the image click for JPG:", error);
+    }
+  } else if (event.type === 'contextmenu') { // Правый клик
+    event.preventDefault(); // Отменяем стандартное контекстное меню
+    console.log("Right click:", filePath);
+    // Здесь разместите логику для обработки правого клика
+    const newImage = { thumb_path: filePath, file_path: filePath };
+    addToRightPanel(newImage);
   }
 };
+
 
 const handleEffectsButtonClick = async (filePath: string) => {
   console.log("Button clicked:", filePath);
@@ -627,7 +629,7 @@ const getClickHandler = (button: ButtonData, tabId: string) => {
     case 'frames':
       return () => handleFrameButtonClick(button.file_path);
     case 'details':
-      return () => handleDetailButtonClick(button.file_path);
+      return (event: React.MouseEvent<HTMLButtonElement>) => handleDetailButtonClick(button.file_path, event);
     case 'textures':
       return () => handleTextureButtonClick(button.file_path, activeButton === 0 ? color1 :
         activeButton === 1 ? color2 :
@@ -663,7 +665,7 @@ const getClickHandler = (button: ButtonData, tabId: string) => {
                   onClick={(event) => {
                     event.stopPropagation();
                     const clickHandler = getClickHandler(button, lastSearchTabId);
-                    clickHandler(); // Вызываем обработчик клика для данной кнопки
+                    clickHandler(event); // Вызываем обработчик клика для данной кнопки
                   }}
                 >
                   <img src={button.thumb_path} alt="Image Preview" />
@@ -691,7 +693,7 @@ const getClickHandler = (button: ButtonData, tabId: string) => {
     color3
   }
   onFrameClick={handleFrameButtonClick}
-  onDetailClick={handleDetailButtonClick}
+  onDetailClick={(filePath, event) => handleDetailButtonClick(filePath, event)}
   onEffectClick={handleEffectsButtonClick}
   onTextureClick={handleTextureButtonClick}
   color1={color1}
@@ -732,8 +734,12 @@ const getClickHandler = (button: ButtonData, tabId: string) => {
                     family={tabId}
                     group={group.title}
                     subgroup={subgroup.title}
-                    onImageClick={handleDetailButtonClick}
-                  />
+                    onImageClick={(filePath, event) => handleDetailButtonClick(filePath, event)}
+                    onAddToRightPanel={(button) => {
+                      addToRightPanel(button);
+                    }}
+
+                    />
                   
               ) : tabId === 'effects' ? ( 
                   <EffectsDropdown 

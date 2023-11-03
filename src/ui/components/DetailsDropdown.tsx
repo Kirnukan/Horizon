@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { getImagesByFamilyGroupAndSubgroup } from "@common/network/api";
-
+interface ButtonData {
+  thumb_path: string;
+  file_path: string;
+}
 interface DetailsDropdownProps {
   title: string;
   imageActive: string;
@@ -10,7 +13,9 @@ interface DetailsDropdownProps {
   subgroup: string;
   isOpen: boolean;
   onOpen: () => void;
-  onImageClick: (filePath: string) => void;
+  onImageClick: (filePath: string, event: React.MouseEvent<HTMLButtonElement>) => void;
+  onContextMenu?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onAddToRightPanel?: (button: ButtonData) => void;
 }
 
 const DetailsDropdown: React.FC<DetailsDropdownProps> = ({
@@ -23,13 +28,12 @@ const DetailsDropdown: React.FC<DetailsDropdownProps> = ({
   isOpen,
   onOpen,
   onImageClick,
+  onContextMenu,
+  onAddToRightPanel,
 }) => {
   const [buttons, setButtons] = useState<ButtonData[]>([]);
 
-  interface ButtonData {
-    thumb_path: string;
-    file_path: string;
-  }
+
 
   useEffect(() => {
     const updatePreview = async () => {
@@ -73,7 +77,12 @@ const DetailsDropdown: React.FC<DetailsDropdownProps> = ({
               style={{ backgroundColor: `#FFFFFF` }}
               onClick={(event) => {
                   event.stopPropagation();
-                  onImageClick(button.file_path);
+                  onImageClick(button.file_path, event);
+              }}
+              onContextMenu={(event) => {
+                // console.log("Context menu event:", event);
+                event.preventDefault(); // Это предотвратит появление стандартного контекстного меню
+                onAddToRightPanel?.(button); // Вызов функции addToRightPanel с текущими данными кнопки
               }}
           >
               <img src={button.thumb_path} alt="Details Preview" />
