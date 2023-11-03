@@ -93,6 +93,8 @@ import RarelyUsed from "./RarelyUsed";
     const [tabId, setTabId] = useState<string>('frames');
     const [notification, setNotification] = useState('');
     const [rarelyUsedImages, setRarelyUsedImages] = useState<ButtonData[]>([]);
+    const [lastSearchTabId, setLastSearchTabId] = useState('');
+
 
     // useEffect(() => {
     //   const fetchRarelyUsedImages = async (idTab:string) => {
@@ -124,6 +126,7 @@ import RarelyUsed from "./RarelyUsed";
           console.log('results', results);
           if (results && results.length > 0) {
               setSearchResults(results);
+              setLastSearchTabId(idTab);
               setNotification('');  // Очистить уведомление, если были найдены результаты
           } else {
               
@@ -619,6 +622,22 @@ const handleTextureButtonClick = async (texturePath: string, color: string) => {
 
 
 
+const getClickHandler = (button: ButtonData, tabId: string) => {
+  switch (tabId) {
+    case 'frames':
+      return () => handleFrameButtonClick(button.file_path);
+    case 'details':
+      return () => handleDetailButtonClick(button.file_path);
+    case 'textures':
+      return () => handleTextureButtonClick(button.file_path, activeButton === 0 ? color1 :
+        activeButton === 1 ? color2 :
+        color3);
+    case 'effects':
+      return () => handleEffectsButtonClick(button.file_path);
+    default:
+      return () => undefined;
+  }
+};
 
 
 
@@ -637,18 +656,18 @@ const handleTextureButtonClick = async (texturePath: string, color: string) => {
           <>
             <div className="buttons">
                 {searchResults.map((button, index) => (
-                              <button
-                                key={index}
-                                className={`dropdown-button`}
-                                style={{ backgroundImage: `url(${button.thumb_path})` }}
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  // console.log("Button clicked with:", button.file_path, selectedColor);  // <-- добавьте эту строку
-                                  // onTextureClick(button.file_path, selectedColor);
-                              }}
-                            >
-                                <img src={button.thumb_path} alt="Texture Preview" />
-                            </button>
+                  <button
+                  key={index}
+                  className={`dropdown-button`}
+                  style={{ backgroundImage: `url(${button.thumb_path})` }}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    const clickHandler = getClickHandler(button, lastSearchTabId);
+                    clickHandler(); // Вызываем обработчик клика для данной кнопки
+                  }}
+                >
+                  <img src={button.thumb_path} alt="Image Preview" />
+                </button>
                 ))}
             </div>
                 {tabId === 'frames' && renderFramesContent()}
