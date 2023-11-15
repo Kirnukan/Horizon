@@ -36,7 +36,10 @@ import RarelyUsed from "./RarelyUsed";
     handleImageClick: (index: number) => void;
   }
 
-
+  interface OpenDropdowns {
+    [key: string]: boolean; // This is an index signature
+  }
+  
 
 
 
@@ -426,12 +429,23 @@ const updateSVGColors = (svgString: string): string => {
           updateSVGColors(currentSVG);
       }
   }, [color1, color2, color3]);
-    const handleOpenDropdown = (dropdownId: string) => {
-      setOpenDropdown(prevState => ({
-        ...prevState,
-        [dropdownId]: true,
-      }));
-    };
+const handleOpenDropdown = (dropdownId: string) => {
+  setOpenDropdown(prevState => {
+    // Now TypeScript knows that prevState has a string index signature
+    const newState: OpenDropdowns = {}; // Initialize with the correct type
+
+    // Set all dropdowns to false
+    Object.keys(prevState).forEach(key => {
+      newState[key] = false;
+    });
+
+    // Toggle the clicked dropdown
+    newState[dropdownId] = !prevState[dropdownId];
+
+    return newState;
+  });
+};
+
 
     const handleHorizontalMirrorClick = () => {
         NetworkMessages.HORIZONTAL_MIRROR.send({});
@@ -656,19 +670,19 @@ const getClickHandler = (button: ButtonData, tabId: string) => {
 
         {searchResults.length > 0 ? (
           <>
-            <div className="buttons">
+            <div className="buttons buttons-search">
                 {searchResults.map((button, index) => (
                   <button
                   key={index}
-                  className={`dropdown-button`}
-                  style={{ backgroundImage: `url(${button.thumb_path})` }}
+                  className={`dropdown-button dropdown-button-search`}
+                  // style={{ backgroundImage: `url(${button.thumb_path})` }}
                   onClick={(event) => {
                     event.stopPropagation();
                     const clickHandler = getClickHandler(button, lastSearchTabId);
                     clickHandler(event); // Вызываем обработчик клика для данной кнопки
                   }}
                 >
-                  <img src={button.thumb_path} alt="Image Preview" />
+                  <img className={`dropdown-button-search-image`} src={button.thumb_path} alt="Image Preview" />
                 </button>
                 ))}
             </div>
@@ -702,8 +716,9 @@ const getClickHandler = (button: ButtonData, tabId: string) => {
 />
 
 
-
+  <div className="dropdowns-list">
         {tabData.groups.map((group: Group) => (
+          
           <SimpleDropdown key={group.title} title={group.title}>
             <div className="type-dropdown-container">
               {group.subgroups.map((subgroup: Subgroup) => (
@@ -777,7 +792,9 @@ const getClickHandler = (button: ButtonData, tabId: string) => {
               ))}
             </div>
           </SimpleDropdown>
+          
         ))}
+        </div>
       </div>
     );
     };

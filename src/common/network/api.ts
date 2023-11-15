@@ -72,7 +72,7 @@ export const getImageByFilePath = async (filePath: string) => {
 export const searchImagesByKeywordAndFamily = async (keyword: string, family?: string) => {
   const params: Record<string, string | number> = { keyword };
   if (family) {
-    params.family = family;
+    params.family = family.charAt(0).toUpperCase() + family.slice(1);
   }
   console.log('search',params)
 

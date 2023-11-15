@@ -1,4 +1,4 @@
-// images.js
+// groups.util.ts
 import imageActive1 from '@ui/assets/GroupImages/group_active_01.jpg';
 import imagePassive1 from '@ui/assets/GroupImages/group_passive_01.jpg';
 import imageActive2 from '@ui/assets/GroupImages/Group_active_02.jpg';

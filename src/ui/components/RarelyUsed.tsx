@@ -83,16 +83,11 @@ const RarelyUsed: React.FC<RarelyUsedProps> = ({
   return (
     <div className="rarely-used-container">
       <div className="rarely-used-header">Rarely used</div>
-        <div className="buttons">
+        <div className="rarely-used-buttons">
         {rarelyUsedImages.map((button, index) => (
           <button
             key={index}
-            className="dropdown-button"
-            style={{
-              backgroundImage: `url(${button.thumb_path})`,
-              // Добавить изменение цвета для вкладки 'frames'
-              // backgroundColor: tabId === 'frames' ? someColorFunction(index) : 'initial'
-            }}
+            className="dropdown-button rarely-used-dropdown-button"
             onClick={(event) => {
               event.stopPropagation();
               const clickHandler = getClickHandler(button.file_path);

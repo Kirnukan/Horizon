@@ -216,12 +216,19 @@
         gap: 10px;
       }
       
+      .dropdowns-list {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        gap: 10px;
+      }
+
       .simple-dropdown {
         flex: 1 0 152px;
         border-radius: 6px 6px 0px 0px;
         border: 1px solid #F7F7F7;
         background: #FFF;
-        
+
         &.open {
           flex: 1 0 100%;
           background: #292F40;
@@ -231,12 +238,16 @@
             // flex-wrap: wrap;
             gap: 4px;
             background: var(--unnamed, #FFF);
-            padding: 15px;
+            padding: 10px;
           }
           
           .dropdown-header {
             color: var(--unnamed, #FFF);
           }
+        }
+        &.closed {
+          max-width: 152px;
+          height: 81px;
         }
       }
       
@@ -316,6 +327,7 @@
           }
           .type-dropdown {
             display: flex;
+            // box-sizing: border-box; /* Уже должно быть установлено, но на всякий случай упоминаем */
             width: 92px;
             height: 47px;
             justify-content: center;
@@ -323,19 +335,27 @@
             padding-bottom: 0px;
             border-radius: 4px;
             border: 1px solid #F2F2F2;
+            // box-shadow: inset 0 0 0 1px #F2F2F2;
             background: #FFF;
             margin-bottom: 15px;
             &.open {
               border: 2px solid #66B2FF;
+              // padding: 0px;
+              // box-shadow: inset 0 0 0 1px #66B2FF;
               background: #FFF;
-              grid-column: 1 / -1; // Занимает весь ряд, начиная от первой ячейки
-
+              grid-column: 1 / -1; /* Занимает весь ряд, начиная от первой ячейки */
             }
           }
+          
       
           .type-dropdown-header-icon {
             max-width: 92px;
             border-radius: 6px;
+            // padding: 2px;
+            border: 1px solid #F2F2F2; /* По умолчанию используем 1px границу */
+            &.open {
+              border: 2px solid #66B2FF;
+            }
           }
         }
       }
@@ -347,7 +367,7 @@
           align-items: flex-start;
           // margin-left: -15px;
           .buttons {
-            margin-left: -15px; 
+            margin-left: -10px; 
           }
         }
       
@@ -363,17 +383,55 @@
           align-items: flex-end;
           .buttons {
             padding: 15px;
-            margin-right: -16px;
+            margin-right: -10px;
           }
         }
       }
       
-
+      .rarely-used {
+        &-header {
+          padding: 3px 6px;
+          font-family: Stapel;
+          font-size: 12px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: normal;
+          cursor: pointer;
+          color: #fff;
+          background-color: #737C99;
+          border-top-left-radius: 6px;
+          border-top-right-radius: 6px;
+          outline: none;
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+        }
+  
+        &-buttons {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+          gap: 4px;
+          padding: 15px;
+          margin-bottom: 15px;
+          min-width: 284px;
+          // padding-right: 20px;
+          z-index: 1000;
+          background: #FFFFFF;
+          border-bottom: 1px solid #F2F2F2;
+          border-right: 1px solid #F2F2F2;
+          border-left: 1px solid #F2F2F2;
+          border-bottom-left-radius: 6px;
+          border-bottom-right-radius: 6px;
+        }
+        &-dropdown-button {
+          border: 1px solid #f7f7f7 !important;
+        }
+      }
 
       .buttons {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
-        gap: 5px;
+        gap: 4px;
         background-color: #F2F2F2;
         padding: 15px;
         margin-bottom: 15px;
@@ -387,10 +445,10 @@
         display: flex; /* Сделать контейнер кнопки гибким для корректного выравнивания SVG */
         align-items: center; /* Центрировать SVG по вертикали */
         justify-content: center; /* Центрировать SVG по горизонтали */
-        padding: 2px;
+        padding: 0px;
         border-width: 0;
         border-radius: 4px;
-
+        background-color: #fff;
       }
       
       .dropdown-button img { /* Селектор для SVG внутри кнопки */
@@ -413,7 +471,7 @@
       border: 2px solid #66B2FF;
     }
     
-        
+
 
     .right-panel {
       // Стили для .right-panel здесь
@@ -515,6 +573,18 @@
     }
     
 
+    .buttons-search {
+
+    }
+    .dropdown-button-search {
+      border: 1px solid var(--i, #f7f7f7);
+    }
+    .dropdown-button-search-image {
+      border: 1px solid var(--i, #f7f7f7);
+      &:hover{
+        border: 2px solid var(--i, #66B2FF);
+      }
+    }
     
     .opacity-slider-container {
       display: flex;

@@ -180,8 +180,24 @@ export const tabsData: Tab[] = [
             imageActive: groupsUtil.imageActive3,
             imagePassive: groupsUtil.imagePassive3
           },
+          {
+            title: "Diamonds",
+            imageActive: groupsUtil.imageActive1,
+            imagePassive: groupsUtil.imagePassive1
+          },
+          {
+            title: "Pedestal",
+            imageActive: groupsUtil.imageActive2,
+            imagePassive: groupsUtil.imagePassive2
+          },
+          {
+            title: "Water",
+            imageActive: groupsUtil.imageActive3,
+            imagePassive: groupsUtil.imagePassive3
+          },
         ]
       },
+      
       {
         title: "Plants",
         subgroups: [
