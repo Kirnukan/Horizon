@@ -715,6 +715,7 @@ const getClickHandler = (button: ButtonData, tabId: string) => {
   color3={color3}
 />
 
+<div className="divider"></div>
 
   <div className="dropdowns-list">
         {tabData.groups.map((group: Group) => (

@@ -586,6 +586,14 @@
       }
     }
     
+    .homepage .dropdown-button svg {
+      border-radius: 6px;
+      border: 1px solid var(--i, #f7f7f7);
+      &:hover{
+        border: 2px solid var(--i, #66B2FF);
+      }
+    }
+
     .opacity-slider-container {
       display: flex;
       
@@ -647,7 +655,13 @@
         }
       }
     }
-  
+    .divider {
+      width: 342px;
+      align-self: center;
+      height: 0;
+      padding: 15px 0; /* По 15px отступа сверху и снизу */
+      border-top: 1px solid var(--i, #F2F2F2); /* Линия шириной в 1px */
+    }
     
 /* Стили для полосы прокрутки */
 .left-panel::-webkit-scrollbar {

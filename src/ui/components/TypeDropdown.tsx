@@ -109,13 +109,13 @@ const TypeDropdown: React.FC<TypeDropdownProps> = ({
             <button
               key={index}
               className="dropdown-button"
-              style={{ backgroundImage: `url(${button.thumb_path})` }}
+              // style={{ backgroundImage: `url(${button.thumb_path})` }}
               onClick={(event) => {
                   event.stopPropagation();
                   onImageClick(button.file_path);
               }}
           >
-              <div className="dropdown-button" dangerouslySetInnerHTML={{ __html: button.svgContent }} />
+              <div className="dropdown-button-svg" dangerouslySetInnerHTML={{ __html: button.svgContent }} />
           </button>
           ))}
         </div>
