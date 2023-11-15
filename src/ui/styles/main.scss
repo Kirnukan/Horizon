@@ -228,6 +228,8 @@
         border-radius: 6px 6px 0px 0px;
         border: 1px solid #F7F7F7;
         background: #FFF;
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius: 6px;
 
         &.open {
           flex: 1 0 100%;
@@ -573,9 +575,7 @@
     }
     
 
-    .buttons-search {
 
-    }
     .dropdown-button-search {
       border: 1px solid var(--i, #f7f7f7);
     }
