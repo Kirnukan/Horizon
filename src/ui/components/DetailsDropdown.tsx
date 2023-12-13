@@ -81,7 +81,7 @@ const DetailsDropdown: React.FC<DetailsDropdownProps> = ({
               }}
               onContextMenu={(event) => {
                 // console.log("Context menu event:", event);
-                event.preventDefault(); // Это предотвратит появление стандартного контекстного меню
+                event.preventDefault(); // Предотвращение появления стандартного контекстного меню
                 onAddToRightPanel?.(button); // Вызов функции addToRightPanel с текущими данными кнопки
               }}
           >

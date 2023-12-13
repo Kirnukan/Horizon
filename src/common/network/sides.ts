@@ -11,7 +11,7 @@ export namespace NetworkSide {
   export const UI = Networker.Side.register(
     new Networker.Side("UI", {
       shouldHandle: (event) => event.data?.pluginId != null,
-      messageGetter: (event) => event.data.pluginMessage,
+      messageGetter: (event) => event.data?.pluginMessage,
       attachListener: (callback) =>
         window.addEventListener("message", callback),
       detachListener: (callback) =>

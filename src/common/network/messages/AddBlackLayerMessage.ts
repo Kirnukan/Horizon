@@ -18,26 +18,23 @@ export class AddBlackLayerMessage extends Networker.MessageType<Payload> {
             if (node.type === "FRAME") {
                 let svgToUse;
 
-                if (node.width === node.height) {  // Square frame
+                if (node.width === node.height) {
                     svgToUse = payload.svgStandard;
-                } else {  // Both Vertical and Horizontal frame use Wide
+                } else {
                     svgToUse = payload.svgWide;
                 }
 
                 const svgNode = figma.createNodeFromSvg(svgToUse);
 
-                if (node.height > node.width) {  // Vertical frame
+                if (node.height > node.width) {
                     svgNode.rotation = -90;
 
-                    // Fit the SVG to the frame size
                     svgNode.resize(node.height, node.width);
 
-                    // Centering the SVG node inside the frame
                     svgNode.x = node.width;
                     svgNode.y = 0;
                     
                 } else {
-                    // Resize SVG to fit the frame for non-vertical frames
                     const aspectRatioSvg = svgNode.width / svgNode.height;
                     let newWidth, newHeight;
                     if (node.width / node.height > aspectRatioSvg) {
@@ -53,9 +50,8 @@ export class AddBlackLayerMessage extends Networker.MessageType<Payload> {
                     svgNode.y = (node.height - newHeight) / 2;
                 }
 
-                // Add the node after positioning and resizing to make positioning relative to frame
                 node.appendChild(svgNode);
-                svgNode.fills = []; // Set to empty array for full transparency
+                svgNode.fills = [];
             }
         });
     }

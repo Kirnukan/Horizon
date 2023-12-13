@@ -78,7 +78,7 @@ const TexturesDropdown: React.FC<TexturesDropdownProps> = ({
               style={{ backgroundImage: `url(${button.thumb_path})` }}
               onClick={(event) => {
                 event.stopPropagation();
-                console.log("Button clicked with:", button.file_path, selectedColor);  // <-- добавьте эту строку
+                console.log("Button clicked with:", button.file_path, selectedColor);
                 onTextureClick(button.file_path, selectedColor);
             }}
           >

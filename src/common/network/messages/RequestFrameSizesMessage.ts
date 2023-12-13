@@ -10,7 +10,6 @@ export class RequestFrameSizesMessage extends Networker.MessageType<null> {
     public handle(_: null, from: Networker.Side): void {
       const nodes = figma.currentPage.selection;
       const sizes = nodes.map(node => ({ width: node.width, height: node.height }));
-      // Отправка ответа в UI
       new FrameSizesResponseMessage("frame-sizes-response").send({sizes});
     }
 }

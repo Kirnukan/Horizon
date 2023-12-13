@@ -13,6 +13,8 @@ import { VerticalMirrorMessage } from "@common/network/messages/VerticalMirrorMe
 import { AddImageToFigmaMessage } from "./messages/AddImageToFigmaMessage";
 import { AddTextureToFigmaMessage } from "./messages/AddTextureToFigmaMessage";
 import { AddEffectToFigmaMessage } from "./messages/AddEffectToFigmaMessage";
+import { CheckRequestMessage } from "./messages/CheckRequestMessage";
+import { CheckResponseMessage } from "./messages/CheckResponseMessage";
 
 
 export namespace NetworkMessages {
@@ -66,6 +68,16 @@ export namespace NetworkMessages {
       new VerticalMirrorMessage("vertical-mirror")
   );
 
+  export const CHECK_REQUEST = registry.register(
+    new CheckRequestMessage("check-request")
+  );
+  
+  export const CHECK_RESPONSE = registry.register(
+    new CheckResponseMessage("check-response")
+  );
+
+  
+  
 
 
 }

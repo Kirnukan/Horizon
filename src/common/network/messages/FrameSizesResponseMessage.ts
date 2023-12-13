@@ -11,7 +11,6 @@ export class FrameSizesResponseMessage extends Networker.MessageType<Payload> {
     }
 
     public handle(payload: Payload, from: Networker.Side): void {
-      // Вы можете использовать `payload.sizes` здесь для обновления UI
       console.log(payload.sizes);
   }  
 }

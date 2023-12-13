@@ -13,7 +13,6 @@ export class RotateFrameMessage extends Networker.MessageType<{}> {
             if (node.type === "FRAME" && node.width === node.height) {
                 let lastFrameChild = null;
 
-                // Итерируемся по детям node
                 for (const child of node.children) {
                     if (child.type === "FRAME") {
                         lastFrameChild = child;
@@ -21,7 +20,6 @@ export class RotateFrameMessage extends Networker.MessageType<{}> {
                 }
 
                 if (lastFrameChild && "rotation" in lastFrameChild) {
-                    // Поворачиваем изображение против часовой стрелки
                     lastFrameChild.rotation = (lastFrameChild.rotation - 90) % 360;
                     const roundedRotation = Math.round(lastFrameChild.rotation);
                     console.log(roundedRotation)

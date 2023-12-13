@@ -37,7 +37,7 @@ import RarelyUsed from "./RarelyUsed";
   }
 
   interface OpenDropdowns {
-    [key: string]: boolean; // This is an index signature
+    [key: string]: boolean;
   }
   
 
@@ -59,7 +59,7 @@ import RarelyUsed from "./RarelyUsed";
       };
   };
 
-    // Подписываемся на изменения выделения при монтировании компонента
+    // Подписываемся на изменения выделения
     useEffect(() => {
         const handleSelectionChange = (event: MessageEvent<SelectionChangeMessage>) => {
             const message = event.data.pluginMessage;
@@ -82,7 +82,6 @@ import RarelyUsed from "./RarelyUsed";
 
 
     const tabs = ["frames", "textures", "details", "effects"];
-    // const [colors, setColors] = useState(["#0A64AD", "#FFFFFF", "#059DF5"]);
     const [openDropdown, setOpenDropdown] = useState<Record<string, boolean>>({});
     const [searchTerm, setSearchTerm] = useState('');
     const [color1, setColor1] = useState("#000000");
@@ -99,18 +98,6 @@ import RarelyUsed from "./RarelyUsed";
     const [lastSearchTabId, setLastSearchTabId] = useState('');
 
 
-    // useEffect(() => {
-    //   const fetchRarelyUsedImages = async (idTab:string) => {
-    //     try {
-    //       const images = await getLeastUsedImagesByFamily(idTab); // предполагая, что tabId - это текущее семейство
-    //         setRarelyUsedImages(images);
-    //     } catch (error) {
-    //       console.error('Failed to fetch rarely used images:', error);
-    //     }
-    //   };
-      
-    //   fetchRarelyUsedImages(tabId);
-    // }, [tabId]); 
     interface ButtonData {
       thumb_path: string;
       file_path: string;
@@ -130,7 +117,7 @@ import RarelyUsed from "./RarelyUsed";
           if (results && results.length > 0) {
               setSearchResults(results);
               setLastSearchTabId(idTab);
-              setNotification('');  // Очистить уведомление, если были найдены результаты
+              setNotification(''); 
           } else {
               
               setNotification('Ничего не найдено');
@@ -165,7 +152,7 @@ import RarelyUsed from "./RarelyUsed";
               
               // Если поле ввода пустое и отображается только placeholder
               if (searchTerm === '') {
-                  padding = 25; // устанавливаем расстояние в 30px от центра поля
+                  padding = 25; 
               }
     
               let rightPosition = (inputWidth - textWidth) / 2 - iconWidth - padding;
@@ -243,7 +230,7 @@ import RarelyUsed from "./RarelyUsed";
       
       // Проверка, совпадает ли новый цвет с другими цветами
       while (otherColors.includes(adjustedColor)) {
-          // Если совпадает, немного измените его
+          // Если совпадает, немного изменяем
           adjustedColor = adjustColor(adjustedColor);
       }
   
@@ -316,27 +303,6 @@ import RarelyUsed from "./RarelyUsed";
       return `/static/images/${parts.join("/")}`;
   };
   
-  
-  
-
-//   const handleButtonClick = async (filePath: string) => {
-//     console.log("Button clicked:", filePath);
-//     try {
-//         let standardSVGString = await handleImageClick(filePath);
-//         standardSVGString = updateSVGColors(standardSVGString);  // Обновляем цвета в стандартном SVG
-        
-//         const wideSVGPath = convertToWidePath(filePath);
-//         let wideSVGString = await handleImageClick(wideSVGPath);
-//         wideSVGString = updateSVGColors(wideSVGString);  // Обновляем цвета в широком SVG
-
-//         // Отправка SVG в Figma. Мы передаем оба SVG: стандартный и широкий.
-//         NetworkMessages.ADD_BLACK_LAYER.send({ svgStandard: standardSVGString, svgWide: wideSVGString });
-//     } catch (error) {
-//         console.error('Ошибка при отправке SVG в Figma:', error);
-//     }
-// };
-
-
 const handleFrameButtonClick = async (filePath: string) => {
   console.log("Button clicked:", filePath);
   try {
@@ -347,7 +313,7 @@ const handleFrameButtonClick = async (filePath: string) => {
       let wideSVGString = await retrieveImageByPath(wideSVGPath);
       wideSVGString = updateSVGColors(wideSVGString);  // Обновляем цвета в широком SVG
 
-      // Отправка SVG в Figma. Мы передаем оба SVG: стандартный и широкий.
+      // Отправка SVG в Figma передаем оба SVG: стандартный и широкий.
       await increaseImageUsage(filePath)
       NetworkMessages.ADD_BLACK_LAYER.send({ svgStandard: standardSVGString, svgWide: wideSVGString });
   } catch (error) {
@@ -370,7 +336,6 @@ const handleDetailButtonClick = async (filePath: string, event: React.MouseEvent
   } else if (event.type === 'contextmenu') { // Правый клик
     event.preventDefault(); // Отменяем стандартное контекстное меню
     console.log("Right click:", filePath);
-    // Здесь разместите логику для обработки правого клика
     const newImage = { thumb_path: filePath, file_path: filePath };
     addToRightPanel(newImage);
   }
@@ -431,8 +396,7 @@ const updateSVGColors = (svgString: string): string => {
   }, [color1, color2, color3]);
 const handleOpenDropdown = (dropdownId: string) => {
   setOpenDropdown(prevState => {
-    // Now TypeScript knows that prevState has a string index signature
-    const newState: OpenDropdowns = {}; // Initialize with the correct type
+    const newState: OpenDropdowns = {};
 
     // Set all dropdowns to false
     Object.keys(prevState).forEach(key => {
@@ -482,24 +446,25 @@ const handleOpenDropdown = (dropdownId: string) => {
                   <div className="pallete">
                     Colors
                     <div className="pallete-colors">
-                      <input
-                          className="pallete-button"
-                          type="color"
-                          value={color1}
-                          onChange={(e: ChangeEvent<HTMLInputElement>) => onColorChange(setColor1, e.target.value, color2, color3)} 
-                      />
-                      <input
-                          className="pallete-button"
-                          type="color"
-                          value={color2}
-                          onChange={(e: ChangeEvent<HTMLInputElement>) => onColorChange(setColor2, e.target.value, color1, color3)} 
-                      />
-                      <input
-                          className="pallete-button"
-                          type="color"
-                          value={color3}
-                          onChange={(e: ChangeEvent<HTMLInputElement>) => onColorChange(setColor3, e.target.value, color1, color2)} 
-                      />
+                    <input
+  className="pallete-button"
+  type="color"
+  value={color1}
+  onInput={(e: ChangeEvent<HTMLInputElement>) => onColorChange(setColor1, e.target.value, color2, color3)} 
+/>
+<input
+  className="pallete-button"
+  type="color"
+  value={color2}
+  onInput={(e: ChangeEvent<HTMLInputElement>) => onColorChange(setColor2, e.target.value, color1, color3)} 
+/>
+<input
+  className="pallete-button"
+  type="color"
+  value={color3}
+  onInput={(e: ChangeEvent<HTMLInputElement>) => onColorChange(setColor3, e.target.value, color1, color2)} 
+/>
+
 
                     </div>
                     
@@ -539,7 +504,6 @@ const handleOpenDropdown = (dropdownId: string) => {
 
     const renderDetailsContent = () => (
         <div>
-            {/* TODO: Добавьте ваш контент для вкладки "Details" */}
         </div>
     );
 
@@ -582,7 +546,6 @@ const renderTexturesContent = () => (
             <span className="opacity-value">{opacity}%</span>
         </div>
 
-        {/* Ваш код для остального содержимого */}
     </div>
 );
 
@@ -659,7 +622,6 @@ const getClickHandler = (button: ButtonData, tabId: string) => {
 
     const renderEffectsContent = () => (
         <div>
-            {/* TODO: Добавьте ваш контент для вкладки "Effects" */}
         </div>
     );
     return (
@@ -679,7 +641,7 @@ const getClickHandler = (button: ButtonData, tabId: string) => {
                   onClick={(event) => {
                     event.stopPropagation();
                     const clickHandler = getClickHandler(button, lastSearchTabId);
-                    clickHandler(event); // Вызываем обработчик клика для данной кнопки
+                    clickHandler(event); 
                   }}
                 >
                   <img className={`dropdown-button-search-image`} src={button.thumb_path} alt="Image Preview" />

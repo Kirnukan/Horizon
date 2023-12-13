@@ -86,8 +86,6 @@ const TypeDropdown: React.FC<TypeDropdownProps> = ({
     const handleDropdownClick = () => {
         onOpen();
     };
-  // Для удобства, я убрал обновление превью из зависимостей `useEffect`
-  // Теперь, превью будет обновляться только при открытии выпадающего списка
 
   return (
     <div className="type-dropdown-wrapper">
@@ -109,7 +107,6 @@ const TypeDropdown: React.FC<TypeDropdownProps> = ({
             <button
               key={index}
               className="dropdown-button"
-              // style={{ backgroundImage: `url(${button.thumb_path})` }}
               onClick={(event) => {
                   event.stopPropagation();
                   onImageClick(button.file_path);

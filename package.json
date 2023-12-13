@@ -21,10 +21,11 @@
     "monorepo-networker": "^1.5.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "uuid": "^9.0.1",
     "xml-js": "^1.6.11"
   },
   "devDependencies": {
-    "@figma/plugin-typings": "^1.62.0",
+    "@figma/plugin-typings": "^1.82.0",
     "@svgr/core": "^6.5.1",
     "@types/d3": "^7.4.0",
     "@types/jsdom": "^21.1.1",
@@ -32,6 +33,7 @@
     "@types/postcss-url": "^10.0.0",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
+    "@types/uuid": "^9.0.7",
     "@vitejs/plugin-react": "^3.1.0",
     "cross-os": "^1.5.0",
     "postcss": "^8.4.21",

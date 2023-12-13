@@ -1,4 +1,5 @@
-const BASE_URL = 'http://localhost:8080';
+const BASE_URL = 'https://www.horizon.uniorone.ru';
+const CHECK_URL = 'https://localhost:3000/check';
 
 function nameToUrl(name: string): string {
   return name.replace(/_/g, '/');
@@ -7,18 +8,17 @@ function nameToUrl(name: string): string {
 const transformImagesData = (data: any[]) => {
   return data.map(image => ({
     ...image,
-    nameUrl: nameToUrl(image.name)  // Предполагая, что у вас уже есть функция nameToUrl
+    nameUrl: nameToUrl(image.name)
   }));
 };
 
 
 
-// Создаем URL на основе параметров
 const createUrl = (path: string, params?: Record<string, string | number>) => {
   const url = new URL(path, BASE_URL);
   if (params) {
     Object.entries(params)
-      .filter(([, value]) => value !== undefined)  // Исключаем параметры со значением undefined
+      .filter(([, value]) => value !== undefined)
       .forEach(([key, value]) => {
         url.searchParams.set(key, String(value));
       });
@@ -32,7 +32,6 @@ function capitalizeFirstLetter(string: string): string {
 
 
 
-// 1. Получение изображений по семейству и группе
 export const getImagesByFamilyGroupAndSubgroup = async (family: string, group: string, subgroup: string) => {
   const capitalizedFamily = capitalizeFirstLetter(family);
   const capitalizedGroup = capitalizeFirstLetter(group);
@@ -52,7 +51,6 @@ export const getImagesByFamilyGroupAndSubgroup = async (family: string, group: s
 };
 
 
-// 2. Получение изображения по семейству, группе и номеру
 export const getImageByFilePath = async (filePath: string) => {
   
   const response = await fetch(createUrl(filePath));
@@ -62,13 +60,11 @@ export const getImageByFilePath = async (filePath: string) => {
     throw new Error(`Failed to fetch the image. ${errorMessage}`);
   }
   
-  // Всегда обрабатываем ответ как текст
   return { file_path: await response.text() }; 
 };
 
 
 
-// 3. Поиск изображений по ключевому слову и семейству
 export const searchImagesByKeywordAndFamily = async (keyword: string, family?: string) => {
   const params: Record<string, string | number> = { keyword };
   if (family) {
@@ -89,7 +85,6 @@ export const searchImagesByKeywordAndFamily = async (keyword: string, family?: s
   return transformImagesData(data);
 };
 
-// 4. Получение наименее используемых изображений по семейству
 export const getLeastUsedImagesByFamily = async (family: string, count = 6) => {
   const capitalizedFamily = capitalizeFirstLetter(family);
   const params: Record<string, string | number> = {
@@ -108,7 +103,6 @@ export const getLeastUsedImagesByFamily = async (family: string, count = 6) => {
   return transformImagesData(data);
 };
 
-// 5. Сервировка статических изображений
 export const getStaticImageUrl = (filename: string) => {
   return `${BASE_URL}/static/images/${filename}`;
 };
@@ -126,9 +120,6 @@ export const increaseImageUsage = async (thumbPath: string) => {
   thumbPath = removeUntilStatic(thumbPath)
   console.log('thumbPath',thumbPath)
   try {
-    // console.log(`Sending POST request to: ${BASE_URL}/increase-usage${thumbPath}`);
-    // console.log('About to fetch:', `${BASE_URL}/increase-usage${thumbPath}`);
-    // console.log('Using fetch function:', fetch.toString());
     const response = await fetch(`${BASE_URL}/increase-usage${thumbPath}`, {
       method: 'POST',
       headers: {
@@ -145,6 +136,28 @@ export const increaseImageUsage = async (thumbPath: string) => {
     return response
 
   } catch (error) {
+    throw error;
+  }
+};
+
+
+export const serverCheck = async (data: { uuid: string; ipAddress: string }) => {
+  try {
+    const response = await fetch(CHECK_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    console.log('Данные успешно отправлены на сервер');
+  } catch (error) {
+    console.error('Ошибка при отправке данных на сервер:', error);
     throw error;
   }
 };

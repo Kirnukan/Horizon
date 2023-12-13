@@ -9,7 +9,6 @@ type RightPanelProps = {
 
 const RightPanel: React.FC<RightPanelProps> = (props) => {
 
-    // const [images, setImages] = useState<Array<{ thumb_path: string, file_path: string } | null>>(Array(9).fill(null));
 
 const handleCleanFramesClick = () => {
     console.log('clean')
@@ -17,7 +16,7 @@ const handleCleanFramesClick = () => {
 };
 
 const clearElements = () => {
-  props.setImages(Array(9).fill(null));  // Заполнить массив пустыми значениями
+  props.setImages(Array(9).fill(null));
 };
 
 const addToRightPanel = (button: { thumb_path: string, file_path: string }) => {
@@ -27,8 +26,8 @@ const addToRightPanel = (button: { thumb_path: string, file_path: string }) => {
       if (index !== -1) {
         newImages[index] = button;
       } else {
-        newImages.shift();  // Удалить первый элемент
-        newImages.push(button);  // Добавить новый элемент в конец
+        newImages.shift();
+        newImages.push(button);
       }
       return newImages;
     });

@@ -1,5 +1,4 @@
 import React, { ReactNode, useState, useEffect } from 'react';
-// import './SimpleDropdown.scss'; // Стили для SimpleDropdown
 
 interface SimpleDropdownProps {
   title: string;
@@ -27,7 +26,6 @@ function SimpleDropdown({ title, children }: SimpleDropdownProps) {
   };
 
   const dropdowns = React.Children.map(children, (child, index) => {
-    // Обязательно передайте `key`, `isOpen` и `onOpen` каждому `TypeDropdown`.
     return React.cloneElement(child as React.ReactElement, {
       key: index,
       isOpen: openDropdowns[index] || false,

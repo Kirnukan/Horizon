@@ -1,4 +1,3 @@
-// AddImageToFigmaMessage.ts
 
 import { NetworkSide } from "@common/network/sides";
 import * as Networker from "monorepo-networker";

@@ -13,7 +13,6 @@ export class VerticalMirrorMessage extends Networker.MessageType<{}> {
             if (node.type === "FRAME" && node.height > node.width) {  
                 let lastFrameChild = null;
 
-                // Итерируемся по детям node
                 for (const child of node.children) {
                     if (child.type === "FRAME") {
                         lastFrameChild = child;

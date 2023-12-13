@@ -67,7 +67,6 @@ export class AddTextureToFigmaMessage extends Networker.MessageType<Payload> {
                     const vectorsToMask: { vectorNode: VectorNode; vectorIdx: number; }[] = [];
     
                     console.log('vectorsGroup',vectorsGroup.name)
-                    // extractVectorsFromGroup(vectorsGroup);
                     
                     vectorsGroup.children.forEach((vectorNode, vectorIdx) => {
                         try {
@@ -76,7 +75,6 @@ export class AddTextureToFigmaMessage extends Networker.MessageType<Payload> {
                     
                             console.log(vectorNode.type === 'VECTOR' && isMatchingColor(vectorNode, color));
                     
-                            // If the vector node has the matching color, add it to the vectorsToMask array
                             if (vectorNode.type === "VECTOR" && isMatchingColor(vectorNode, color)) {
                                 console.log(`Matching color on vector node ${vectorIdx}`);
                                 vectorsToMask.push({ vectorNode, vectorIdx });
@@ -86,16 +84,13 @@ export class AddTextureToFigmaMessage extends Networker.MessageType<Payload> {
                             console.error('Error processing vector node', vectorIdx, vectorNodeError);
                         }
                     });
-                    // Now, iterate over vectorsToMask and create the mask groups
                     vectorsToMask.forEach(({ vectorNode, vectorIdx }) => {
-                        // Check for an existing mask group and remove it
                         const existingMaskGroup = vectorNode.parent?.children.find((n: BaseNode) => n.name === `Mask group ${vectorIdx + 1}`) as GroupNode;
                         if (existingMaskGroup) {
                             existingMaskGroup.remove();
                             console.log('Existing mask removed');
                         }
                     
-                        // Call createMaskGroup to create a new mask group
                         const maskGroup = createMaskGroup(vectorNode, rectangle, vectorIdx + 1);
                     
                         if (maskGroup) {
@@ -137,8 +132,6 @@ function toggleTexture(maskGroup: GroupNode): void {
         return;
     }
 
-    // Если Original Vector выше Rectangle, мы переносим Rectangle выше, чтобы показать текстуру.
-    // В противном случае, мы переносим Original Vector выше, чтобы скрыть текстуру.
     if (originalVector.parent && rectangle.parent) {
         const isTextureVisible = originalVector.parent.children.indexOf(originalVector) < originalVector.parent.children.indexOf(rectangle);
         if (isTextureVisible) {
@@ -168,10 +161,8 @@ function handleToggleTexture(group: GroupNode, targetColor: string, newImageHash
                 if (isMatchingColor(vector, targetColor)) {
                     console.log("Color matches target");
 
-                    // Заменяем текстуру в Rectangle
                     replaceTextureInRectangle(maskGroup, newImageHash, targetColor, opacity);
 
-                    // Check if shouldToggle is not defined, then define it as true
                     if (vector.getPluginData("shouldToggle") === "") {
                         vector.setPluginData("shouldToggle", "true");
                     }
@@ -184,20 +175,16 @@ function handleToggleTexture(group: GroupNode, targetColor: string, newImageHash
 
                     console.log("Current indexes - Rectangle:", rectIndex, "Original Vector:", vectorIndex);
 
-                    // If shouldToggle is true, toggle them
                     if (shouldToggle) {
                         console.log("Moving Original Vector above Rectangle");
                         maskGroup.insertChild(rectIndex, vector);
-                        // Toggle shouldToggle value
                         vector.setPluginData("shouldToggle", "false");
                     } else {
                         console.log("Moving Rectangle above Original Vector");
                         maskGroup.insertChild(vectorIndex, rectangle);
-                        // Toggle shouldToggle value
                         vector.setPluginData("shouldToggle", "true");
                     }
 
-                    // Log the new order
                     console.log("New order:", maskGroup.children.map(ch => ch.name).join(", "));
                 } else {
                     console.log("Color does NOT match target");
@@ -246,39 +233,30 @@ function createMaskGroup(vectorNode: VectorNode, rectangle: RectangleNode, group
     const originalPosition = { x: vectorNode.x, y: vectorNode.y };
     console.log('maskName', maskName);
 
-    // Ищем существующую группу масок с таким же именем
     const existingMaskGroup = vectorNode.parent && vectorNode.parent.findOne(n => n.name === maskName) as GroupNode;
 
     if (existingMaskGroup) {
-        // Логи для ветви, где существует группа масок
         console.log('Existing mask group found');
         
-        // Найдена существующая группа масок, удаляем её и извлекаем вектор
         const originalVector = existingMaskGroup.findOne(n => n.name === `Original Vector ${groupNumber}`) as VectorNode;
-        console.log('Original Vector:', originalVector); // Добавьте эту строку для отображения originalVector
+        console.log('Original Vector:', originalVector);
         if (originalVector) {
-            // Переименовываем оригинальный вектор
             originalVector.name = "Vector";
-            // Вытащить вектор из масковой группы и поместить его в родительскую группу
             if (vectorNode.parent) {
                 vectorNode.parent.appendChild(originalVector);
             }
         }
-        // Удалить группу масок
         existingMaskGroup.remove();
-        // Пересортировываем детей, если это необходимо
         renumberChildren(vectorNode.parent as GroupNode | FrameNode);
         return null;
     } else {
-        // Логи для ветви, где нет существующей группы масок
         console.log('No existing mask group found');
         
-        // Группы масок с таким именем нет, создаем новую группу масок
         const maskVector = vectorNode.clone();
         maskVector.name = maskName;
         maskVector.isMask = true;
         
-        console.log('Mask Vector:', maskVector); // Добавьте эту строку для отображения maskVector
+        console.log('Mask Vector:', maskVector);
         vectorNode.name = `Original Vector ${groupNumber}`;
 
         if (vectorNode.parent && (vectorNode.parent.type === 'GROUP' || vectorNode.parent.type === 'FRAME')) {
@@ -298,7 +276,6 @@ function createMaskGroup(vectorNode: VectorNode, rectangle: RectangleNode, group
             maskGroup.children.forEach((vec, idx) => {
                 if (vec.type === "VECTOR" && vec.parent?.type === "GROUP") {
                     
-                    // Если маска вертикальная, применяем трансформации
                     if (vec.parent.parent?.parent?.parent?.parent?.type === 'FRAME' && 
                     vec.parent.parent.parent.parent.parent.height > vec.parent.parent.parent.parent.parent.width) { 
                         vec.rotation = vectorNode.rotation;
@@ -328,22 +305,17 @@ function createMaskGroup(vectorNode: VectorNode, rectangle: RectangleNode, group
 function reorderChildrenByMaskAndVector(parent: GroupNode | FrameNode): void {
     const children = parent.children.slice();
 
-    // Сортировка дочерних элементов родителя
     children.sort((a: SceneNode, b: SceneNode) => {
         const aNumber = extractNumberFromName(a.name);
         const bNumber = extractNumberFromName(b.name);
 
-                // Проверка, является ли один из узлов группой с именем "Group"
                 const aIsGroup = a.type === "GROUP" && a.name === "Group";
                 const bIsGroup = b.type === "GROUP" && b.name === "Group";
         
-                // Если оба узла - группы, оставляем порядок как есть
                 if (aIsGroup && bIsGroup) return 0;
         
-                // Если a - группа, a должна быть выше
                 if (aIsGroup) return 1;
         
-                // Если b - группа, b должна быть выше
                 if (bIsGroup) return -1;
 
         if (a.name.includes("Mask group") && b.name.includes("Mask group")) {
@@ -366,14 +338,13 @@ function reorderChildrenByMaskAndVector(parent: GroupNode | FrameNode): void {
             return 0;
         }
 
-        return 0; // Для всех остальных случаев
+        return 0;
     });
 
     children.forEach((child, index) => {
         parent.insertChild(index, child);
     });
 
-    // Упорядочивание элементов внутри каждой Mask group
     parent.children.forEach(child => {
         if (child.type === "GROUP" && child.name.startsWith('Mask group')) {
             const maskGroup = child as GroupNode;
@@ -404,29 +375,23 @@ function removeExistingMaskGroup(vectorNode: VectorNode, index: number): boolean
         console.log('Looking for:', `Mask group ${index}`);
         console.log('Children names:', vectorNode.parent.children.map(child => child.name));
 
-        // Найти существующую масковую группу
         const existingMaskGroup = vectorNode.parent.findOne(n => n.name === `Mask group ${index}`) as GroupNode;
 
         console.log('Found mask:', existingMaskGroup);
 
         if (existingMaskGroup) {
-            // Найти оригинальный вектор внутри масковой группы
             const originalVector = existingMaskGroup.findOne(n => n.name === `Original Vector ${index}`) as VectorNode;
 
             if (originalVector) {
-                // Переименовать оригинальный вектор
                 originalVector.name = "Vector";
 
-                // Вытащить вектор из масковой группы и поместить его в родительскую группу
                 if (vectorNode.parent) {
                     vectorNode.parent.appendChild(originalVector);
                 }
             }
 
-            // Удалить масковую группу
             existingMaskGroup.remove();
 
-            // Перенумеровать детей, если это необходимо
             renumberChildren(vectorNode.parent as GroupNode | FrameNode);
 
             return true;
@@ -438,17 +403,15 @@ function removeExistingMaskGroup(vectorNode: VectorNode, index: number): boolean
 
 
 function renameVectorsOutsideMasks(parent: GroupNode | FrameNode): boolean {
-    let counter = 1;  // Начнем нумерацию с 1
-    let renamed = false;  // флаг для отслеживания переименований
+    let counter = 1;
+    let renamed = false;
 
-    // Получим номера всех существующих масок
     const existingMaskNumbers = parent.children
         .filter(child => child.type === "GROUP" && child.name.startsWith("Mask group"))
         .map(maskGroup => extractNumberFromName(maskGroup.name));
 
     parent.children.forEach(child => {
         if (child.type === "VECTOR" && !child.name.startsWith("Original") && !child.name.startsWith("Mask")) {
-            // Если номер уже существует как номер маски, пропустим его
             while (existingMaskNumbers.includes(counter)) {
                 counter++;
             }
@@ -468,26 +431,20 @@ function renameVectorsOutsideMasks(parent: GroupNode | FrameNode): boolean {
 
 
 const extractVectorsFromGroup = (parentGroup: GroupNode): void => {
-    // Найти все группы с именем "Group" внутри parentGroup
     const groupsToExtract = parentGroup.findAll(n => n.type === "GROUP" && n.name === "Group") as GroupNode[];
 
-    // Для каждой найденной группы
     groupsToExtract.forEach(group => {
-        // Создайте копию детей, чтобы сохранить их после удаления
         const childrenCopy = [...group.children];
         
-        // Переместите каждого ребенка в родительскую группу
         childrenCopy.forEach(async child => {
             console.log(`Moving child with ID: ${child.id} and Name: ${child.name}`);
             
-            // Проверка наличия узла перед его перемещением
             const nodeExists = parentGroup.findOne(n => n.id === child.id);
             
             if (nodeExists) {
                 console.log(`Child ${child.id} exists, moving...`);
-                // Удаление и добавление
                 child.remove();
-                await figma.loadFontAsync({ family: "Roboto", style: "Regular" });  // загрузка шрифта как задержка
+                await figma.loadFontAsync({ family: "Roboto", style: "Regular" });
                 parentGroup.appendChild(child);
             } else {
                 console.log(`Child ${child.id} does not exist, skipping...`);
@@ -495,7 +452,6 @@ const extractVectorsFromGroup = (parentGroup: GroupNode): void => {
         });
         
         
-        // Логирование и удаление группы
         console.log(`Removing group with ID: ${group.id} and Name: ${group.name}`);
         group.remove();
     });
@@ -503,18 +459,13 @@ const extractVectorsFromGroup = (parentGroup: GroupNode): void => {
 
 
 const moveGroupsToTop = (parentGroup: GroupNode): void => {
-    // Находим все группы с именем "Group" внутри parentGroup
     const groupsToMove = parentGroup.findAll(n => n.type === "GROUP" && n.name === "Group");
 
-    // Перемещаем каждую группу в начало/верх родительской группы
     groupsToMove.forEach(group => {
-        // Получаем индекс группы в родительской группе
         const index = parentGroup.children.indexOf(group);
         
-        // Если индекс больше 0, перемещаем группу в верхнюю часть
         if(index > 0) {
             parentGroup.insertChild(parentGroup.children.length - 1, group);
-            // group.remove();
         }
     });
 };
@@ -524,31 +475,25 @@ const moveGroupsToTop = (parentGroup: GroupNode): void => {
 function renumberChildren(parent: GroupNode | FrameNode): void {
     let vectorCounter = 1;
     
-    // Проверяем, есть ли хотя бы один вектор без номера
     const hasUnnumberedVectors = parent.children.some(child => child.type === "VECTOR" && child.name === "Vector");
     
-    // console.log('Has unnumbered vectors:', hasUnnumberedVectors);
 
     parent.children.forEach(child => {
-        // console.log('Processing child:', child.name);
         
         if (hasUnnumberedVectors && child.type === "VECTOR" && child.name === "Vector") {
             child.name = `Vector ${vectorCounter}`;
-            // console.log('Renamed to:', child.name);
             vectorCounter++;
         } else if (child.type === "GROUP" && child.name.startsWith("Mask group")) {
             const vectorInsideMask = (child as GroupNode).children.find(n => n.type === "VECTOR" && !n.name.startsWith("Original"));
             if (vectorInsideMask && vectorInsideMask.name.startsWith("Vector ")) {
                 const vectorNumber = extractNumberFromName(vectorInsideMask.name);
                 child.name = `Mask group ${vectorNumber}`;
-                // console.log('Renamed mask group to:', child.name);
             }
         }
     });
 }
 
 function replaceTextureInRectangle(maskGroup: GroupNode, newImageHash: string, color: string, opacity: number): void {
-    // Ищем объект Rectangle в группе масок
     const rectangle = maskGroup.findOne(node => node.name === "Rectangle" && node.type === "RECTANGLE") as RectangleNode;
 
     if (!rectangle) {
@@ -556,7 +501,6 @@ function replaceTextureInRectangle(maskGroup: GroupNode, newImageHash: string, c
         return;
     }
 
-    // Заменяем fill Rectangle новым изображением
     rectangle.fills = [{
         type: "IMAGE",
         scaleMode: "FILL",
@@ -576,7 +520,7 @@ function createTextureRectangle(size: number, imageHash: string, color: string, 
         type: "IMAGE",
         scaleMode: "FILL",
         imageHash: imageHash,
-        blendMode: (color.toLowerCase() !== "#ffffff" && color.toLowerCase() !== "#000000") ? "OVERLAY" : "NORMAL" // Задаем режим наложения для цветных текстур
+        blendMode: (color.toLowerCase() !== "#ffffff" && color.toLowerCase() !== "#000000") ? "OVERLAY" : "NORMAL"
     }];
     rect.strokes = [{
         type: "SOLID",

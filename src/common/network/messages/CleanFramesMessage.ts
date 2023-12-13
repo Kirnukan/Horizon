@@ -13,7 +13,6 @@ export class CleanFramesMessage extends Networker.MessageType<{}> {
             if ("children" in node && node.type === "FRAME") {
                 const childNodes = node.children;
                 if (childNodes.length > 0) {
-                    // удалить последний дочерний узел, который является верхним слоем
                     childNodes[childNodes.length - 1].remove();
                 }
             }

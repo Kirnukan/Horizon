@@ -1,4 +1,3 @@
-// AddEffectToFigmaMessage.ts
 
 import { NetworkSide } from "@common/network/sides";
 import * as Networker from "monorepo-networker";
@@ -22,7 +21,7 @@ export class AddEffectToFigmaMessage extends Networker.MessageType<Payload> {
                     type: "IMAGE",
                     scaleMode: "FIT",
                     imageHash: imageHash,
-                    blendMode: "SCREEN", // Setting blend mode to SCREEN
+                    blendMode: "SCREEN",
                 };
 
                 const rectangle = figma.createRectangle();

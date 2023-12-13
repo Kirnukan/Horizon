@@ -662,7 +662,59 @@
       padding: 15px 0; /* По 15px отступа сверху и снизу */
       border-top: 1px solid var(--i, #F2F2F2); /* Линия шириной в 1px */
     }
-    
+  
+    /* src/styles.css */
+
+.main-component {
+  padding: 20px;
+}
+
+.check-page {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+}
+
+.check-page h1 {
+  text-align: center;
+}
+
+.check-page button {
+  display: block;
+  margin: 0 auto;
+  padding: 10px 20px;
+  font-size: 16px;
+}
+
+/* src/styles.css */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Затемнение */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Выше чем остальные элементы на странице */
+  backdrop-filter: blur(5px); /* Размытие */
+}
+
+.check-page {
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1001; /* Выше чем подложка */
+}
+
+
 /* Стили для полосы прокрутки */
 .left-panel::-webkit-scrollbar {
   width: 4px; /* Ширина полосы */

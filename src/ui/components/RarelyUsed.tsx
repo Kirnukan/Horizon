@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-// Импортируем функцию API для получения наименее используемых изображений
 import { getLeastUsedImagesByFamily } from '../../common/network/api';
 
 interface ButtonData {
@@ -44,15 +43,14 @@ const RarelyUsed: React.FC<RarelyUsedProps> = ({
     };
 
     fetchRarelyUsedImages();
-  }, [tabId]); // Зависимость от tabId обеспечивает обновление при смене вкладки
+  }, [tabId]);
   
-  // Функция для выбора обработчика нажатия кнопки на основе tabId
   const getClickHandler = (file_path: string) => {
     switch (tabId) {
       case 'frames':
         return () => {
           if (onFrameClick) {
-            return onFrameClick(file_path, color1!, color2!, color3!); // '!' используется для утверждения, что значения определены
+            return onFrameClick(file_path, color1!, color2!, color3!);
           }
         }
       case 'details':
@@ -68,8 +66,6 @@ const RarelyUsed: React.FC<RarelyUsedProps> = ({
           }
         }
       case 'textures':
-        // Здесь вы должны определить, какие данные передать
-        // Например: selectedColor и selectedTexture
         return () => {
           if(onTextureClick){
             onTextureClick(file_path, selectedColor);
