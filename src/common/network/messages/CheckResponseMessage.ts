@@ -4,8 +4,8 @@ import { NetworkSide } from "@common/network/sides";
 
 export interface CheckResponsePayload {
   success: boolean;
-  storedUuid: string,
   storedIpAddress: string,
+  storedUuid: string,
 }
 
 export class CheckResponseMessage extends Networker.MessageType<CheckResponsePayload> {

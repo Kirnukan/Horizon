@@ -1,6 +1,7 @@
-const BASE_URL = 'https://www.horizon.uniorone.ru';
-const CHECK_URL = 'https://localhost:3000/check';
-
+const BASE_URL = 'http://localhost:8000';
+// const BASE_URL = 'https://www.horizon.uniorone.ru';
+const CHECK_URL = 'http://localhost:8000/check';
+// const CHECK_URL = 'https://www.horizon.uniorone.ru/check';
 function nameToUrl(name: string): string {
   return name.replace(/_/g, '/');
 }
@@ -141,8 +142,9 @@ export const increaseImageUsage = async (thumbPath: string) => {
 };
 
 
-export const serverCheck = async (data: { uuid: string; ipAddress: string }) => {
+export const serverCheck = async (data: { ipAddress: string; uuid: string }) => {
   try {
+    console.log('data',data)
     const response = await fetch(CHECK_URL, {
       method: 'POST',
       headers: {
@@ -155,7 +157,11 @@ export const serverCheck = async (data: { uuid: string; ipAddress: string }) => 
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    console.log('Данные успешно отправлены на сервер');
+    // Use response.json() to read the JSON content of the response body
+    const responseBody = await response.json();
+
+    console.log('Данные успешно отправлены на сервер ', responseBody);
+    return responseBody;
   } catch (error) {
     console.error('Ошибка при отправке данных на сервер:', error);
     throw error;

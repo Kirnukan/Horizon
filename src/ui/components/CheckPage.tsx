@@ -6,7 +6,7 @@ import { NetworkSide } from '@common/network/sides';
 import * as Networker from 'monorepo-networker';
 import { CheckResponseMessage, CheckResponsePayload } from '@common/network/messages/CheckResponseMessage';
 import { serverCheck } from '@common/network/api';
-
+import { useState } from 'react';
 interface CheckPageProps {
   onClose: () => void;
 }
@@ -26,82 +26,88 @@ const generateUUID = (): string => {
   return uuidv4();
 };
 
+// export let checkServer = ''
+
 const CheckPage: React.FC<CheckPageProps> = ({ onClose }) => {
+  const [isSuccess, setIsSuccess] = React.useState<boolean | null>(null);
+  const [checkServer, setCheckServer] = useState({ message: 'Доступ закрыт!' });
+
   const handleCheck = async () => {
     try {
-      // Generate UUID
       const uuidToUse = generateUUID();
 
-      // Send a CHECK_REQUEST to PLUGIN
       NetworkMessages.CHECK_REQUEST.send({
-        uuid: uuidToUse,
         ipAddress: await getIpAddress(),
+        uuid: uuidToUse,
       });
 
-      // Handle the PLUGIN response via postMessage event
       const handleMessage = async (event: MessageEvent) => {
         const msg = event.data.pluginMessage;
 
         if (msg.type === 'check-response') {
-          // Handle the PLUGIN response
           const response: CheckResponsePayload = await msg.payload;
-          console.log('Response from PLUGIN:', response.storedUuid, ' ', response.storedIpAddress);
-          const data = {uuid: response.storedUuid, ipAddress: response.storedIpAddress}
-          // If the response indicates success, close the UI component
-          // if (response.success) {
-            if (data.uuid && data.ipAddress) {
-              const checkServer = serverCheck(data)
-              console.log('Server Check - ', checkServer)
-            } else {
-              console.log('Server Check - ', data)
-            }
-            onClose();
-          // } else {
-          //   console.error('CHECK_REQUEST to PLUGIN was not successful.');
-          //   // Handle the error condition as needed
-          // }
+          const data = { ipAddress: response.storedIpAddress, uuid: response.storedUuid };
 
-          // Remove the listener after handling the response
+          if (data.ipAddress && data.uuid) {
+            try {
+              const serverCheckResult = await serverCheck(data);
+              setCheckServer(serverCheckResult);
+              console.log('Server Check 1- ', serverCheckResult);
+            } catch (error) {
+              console.error('Error during server check:', error);
+              setCheckServer({ message: 'Доступ закрыт: ошибка на сервере' });
+            }
+          } else {
+            console.log('Server Check - ', data);
+          }
+
           window.removeEventListener('message', handleMessage);
         }
       };
 
-      // Add a listener for the PLUGIN response
       window.addEventListener('message', handleMessage);
     } catch (error) {
       console.error('Error during Check operation:', error);
+      setCheckServer({ message: 'Доступ закрыт: ошибка на клиенте' });
     }
   };
 
-  // Add a listener for messages from the PLUGIN
   React.useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       const msg = event.data.pluginMessage;
-      // console.log(msg)
+
       if (msg.type === 'check-success') {
-        // Handle the check-success message from PLUGIN
         console.log('Received check-success message:', msg);
+        setIsSuccess(true);
+        onClose();
       } else {
-        // Handle other message types if needed
         console.log('Received unknown message:', msg);
-        
+        console.log(checkServer);
+        setIsSuccess(false);
       }
     };
 
-    // Add a listener for messages
     window.addEventListener('message', handleMessage);
-
-    // Clean up the listener when the component unmounts
+    handleCheck();
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, []); // Ensure that this effect runs only once
+  }, []);
+
+  const handleClick = () => {
+    if (checkServer.message === 'Доступ открыт!') {
+      onClose();
+    }
+  };
 
   return (
-    <div className="modal-overlay">
+    <div className="modal-overlay" onClick={handleClick}>
       <div className="check-page">
-        <h1>Check Page</h1>
-        <button onClick={handleCheck}>Check</button>
+        {checkServer.message === 'Доступ открыт!' && <h1>Доступ открыт!</h1>}
+        {/* {checkServer.message === 'Доступ закрыт!' && <h1>Доступ закрыт!</h1>} */}
+        {checkServer.message !== 'Доступ открыт!' && checkServer.message !== 'Доступ закрыт!' && (
+          <h1>{'Доступ закрыт!'}</h1>
+        )}
       </div>
     </div>
   );

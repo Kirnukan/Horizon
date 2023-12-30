@@ -5,8 +5,8 @@ import { CheckResponseMessage, CheckResponsePayload } from "./CheckResponseMessa
 import { NetworkMessages } from "../messages";
 
 interface CheckRequestPayload {
-  uuid: string;
   ipAddress: string;
+  uuid: string;
 }
 
 export class CheckRequestMessage extends Networker.MessageType<CheckRequestPayload, Promise<void>> {
@@ -19,26 +19,32 @@ export class CheckRequestMessage extends Networker.MessageType<CheckRequestPaylo
       // Ensure figma is defined
       if (typeof figma !== 'undefined') {
         // Try to get values from figma.clientStorage
+        // await figma.clientStorage.deleteAsync('ipAddress');
         const storedUuid = await figma.clientStorage.getAsync('uuid');
+        // const payloadIpAddress = await payload.ipAddress
+        console.log('ip Stored - ', payload.ipAddress)
+        await figma.clientStorage.setAsync('ipAddress', payload.ipAddress);
         const storedIpAddress = await figma.clientStorage.getAsync('ipAddress');
-
+        const allIps = await figma.clientStorage.keysAsync()
+        console.log('ip - ', storedIpAddress)
+        console.log('ips - ', allIps)
         // If values are not present, save the received values
+        // if (storedIpAddress !== payloadIpAddress) {
+
+        // }
+        // console.log('ip 2 - ', figma.clientStorage.getAsync('ipAddress'))
         if (!storedUuid) {
           await figma.clientStorage.setAsync('uuid', payload.uuid);
           console.log('uuid - ', figma.clientStorage.getAsync('uuid'))
         }
 
-        if (!storedIpAddress) {
-          await figma.clientStorage.setAsync('ipAddress', payload.ipAddress);
-          console.log('ip - ', figma.clientStorage.getAsync('ipAddress'))
-        }
         const all = await figma.clientStorage.keysAsync()
         console.log('all - ', storedIpAddress, ' ' ,storedUuid)
         // Respond with success payload
         const successPayload: CheckResponsePayload = {
           success: true,
-          storedUuid,
           storedIpAddress,
+          storedUuid,
         };
 
         // Respond with success payload
@@ -51,8 +57,8 @@ export class CheckRequestMessage extends Networker.MessageType<CheckRequestPaylo
       // Respond with failure payload
       const failurePayload: CheckResponsePayload = {
         success: false,
-        storedUuid: '',
         storedIpAddress: '',
+        storedUuid: '',
       };
 
       // Respond with failure payload
